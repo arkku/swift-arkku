@@ -7,6 +7,6 @@ directly into the project. That being said, there are XCode targets for building
 everything as a framework, mainly for testing in the included playground.
 
 Documentation is in the comments of the individual files, and there are
-examples in the playground.
+[examples in the playground](Playground.playground/Contents.swift).
 
 ~ [Kimmo Kulovesi](https://arkku.com/), 2018-08-08

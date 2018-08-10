@@ -31,6 +31,7 @@ mixedArray[0].integerValue != nil
 mixedArray[1].integerValue == nil
 
 // Dates encoded as integers can transparently survive encoding:
+
 mixedArray[2].integerValue == thisDate.integerMillisecondsSince1970
 mixedArray[2] = thisDate.integerMillisecondsSince1970.asValue
 mixedArray[2].dateValue!.integerMillisecondsSince1970 == thisDate.integerMillisecondsSince1970
@@ -39,7 +40,7 @@ thisDate.timeIntervalSince1970
 
 // Containers of `AValue` offer convenient a interface:
 
-var valueDict = [KnownFooKey: AValue](wrapping: dict.keyedByKnown())
+var valueDict = [FooKey: AValue](wrapping: dict)
 valueDict[.foo]?.stringValue == "fooValue"
 
 valueDict[wrapped: .bar] = 10       // automatic wrapping
@@ -88,6 +89,10 @@ struct FooBar: Devaluable {
     }
 }
 
+// Unwrappable structures can first be decoded into `AValue` and then
+// later unwrapped into the structure. This can be very useful with
+// nested, dynamic structures encoded as JSON, for example.
+
 let fooBar = FooBar(unwrapping: decodedArray[3])!
 fooBar.foo == unwrappedDict[wrapped: .foo]!
 fooBar.bar == unwrappedDict[wrapped: .bar]!
@@ -122,6 +127,12 @@ map[.bar] = "bar"
 map.updateValue("FOO", forKey: .foo)
 
 var map2: MapCoded<KnownFooKey, String> = map.keyedByKnown()
+
+// `MapCoded` is can also be combined with the `AValue` helpers:
+
+var valueMap = valueDict.wrappedAsMapCoded
+valueMap[wrapped: .bar] == 10
+valueMap[.foo]!.stringValue! == valueMap["foo"]!.stringValue!
 
 // All of these wrappers are literal-convertible:
 
