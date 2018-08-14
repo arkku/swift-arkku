@@ -59,7 +59,7 @@ public enum KnownOrUnknownString<KnownValue: RawRepresentable>: RawRepresentable
 extension KnownOrUnknownString: CustomStringConvertible, CustomDebugStringConvertible {
     public var description: String {
         switch self {
-        case .known(let known):     return ".\(known)"
+        case .known(let known):     return ".\(known.rawValue)"
         case .unknown(let string):  return string.debugDescription
         }
     }

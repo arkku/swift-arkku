@@ -113,7 +113,7 @@ decodedFooBar.foo == fooBar.foo && decodedFooBar.bar == fooBar.bar
 
 let incorrectJSON = try! encoder.encodedString(from: dict as [FooKey: String])
 
-// This can be solved by wrapping in `MapCoded`
+// This can be solved by wrapping in `MapCoded`:
 
 var map = dict.wrappedAsMapCoded
 let correctJSON = try! encoder.encodedString(from: map)
@@ -140,3 +140,22 @@ map2 = [ .foo: "foo", .baz: "baz" ]
 let intValue: AValue = 10
 let stringValue: AValue = "foo"
 let dictValue: AValue = [ "int": intValue ]
+
+// Simple linked list:
+
+var linkedList = LinkedList<Int>([ 1, 1, 2, 3 ])
+var otherList = linkedList
+
+linkedList == otherList
+linkedList.removeFirst() == 1
+linkedList != otherList
+linkedList > otherList
+linkedList.insertAsFirst(0)
+linkedList.first == 0
+linkedList < otherList
+
+for element in linkedList {
+    print("\(element)")
+}
+
+

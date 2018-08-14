@@ -390,8 +390,7 @@ extension AValue: ValueCodable {
     }
 }
 
-/// A type that can be both wrapped and unwrapped with `AValue`.
-public protocol ValueCodable: Valuable, Devaluable { }
+public typealias ValueCodable = Valuable & Devaluable
 
 extension String: ValueCodable {
     /// Unwrapped from the string `value`.
@@ -735,7 +734,8 @@ extension Data {
 /// and `Codable`.
 public protocol CodedAsValue: ValueCodable { }
 
-extension CodedAsValue {
+public extension CodedAsValue {
+
     public init(from decoder: Decoder) throws {
         let value = try AValue(from: decoder)
         guard let unwrapped = Self(unwrapping: value) else {
