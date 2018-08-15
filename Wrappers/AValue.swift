@@ -199,6 +199,13 @@ public enum AValue: Codable {
         }
     }
 
+    /// The associated string value as a URL, or `nil` if there is no `stringValue`
+    /// or the string value is not a valid URL.
+    public var urlValue: URL? {
+        guard let urlString = stringValue else { return nil }
+        return URL(string: urlString)
+    }
+
     /// The associated value as an integer, or `nil` if this is not an integer,
     /// boolean, or date value. In case of `date`, its value is returned
     /// as integer milliseconds since 1970. In case of `boolean`, the integer
@@ -402,6 +409,17 @@ extension String: ValueCodable {
     /// This string wrapped as `AValue`.
     public var asValue: AValue {
         return AValue.string(self)
+    }
+}
+
+extension URL: ValueCodable {
+    public init?(unwrapping value: AValue) {
+        guard let urlString = value.stringValue else { return nil }
+        self.init(string: urlString)
+    }
+
+    public var asValue: AValue {
+        return AValue.string(absoluteString)
     }
 }
 
@@ -735,7 +753,6 @@ extension Data {
 public protocol CodedAsValue: ValueCodable { }
 
 public extension CodedAsValue {
-
     public init(from decoder: Decoder) throws {
         let value = try AValue(from: decoder)
         guard let unwrapped = Self(unwrapping: value) else {
