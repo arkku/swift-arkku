@@ -53,9 +53,8 @@ public extension JSONEncoder {
         // in one, and then remove the container from the encoded data.
         let quote: UInt8 = 0x22
         guard let lastQuote = encoded.lastIndex(of: quote) else { return Data() }
-        encoded = encoded.prefix(through: lastQuote)
         guard let firstQuote = encoded.firstIndex(of: quote) else { return Data() }
-        encoded = encoded.suffix(from: firstQuote)
+        encoded = encoded.subdata(in: firstQuote..<(encoded.index(after: lastQuote)))
         return encoded
     }
 
