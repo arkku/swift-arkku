@@ -13,6 +13,8 @@
 		4E2A70AA211CF7DE001F21F5 /* MillisecondsDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2A70A4211CF7DE001F21F5 /* MillisecondsDate.swift */; };
 		4E2A70B5211D0780001F21F5 /* AValueKeyedByKnowable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2A70B4211D0780001F21F5 /* AValueKeyedByKnowable.swift */; };
 		4E2A70B6211D0780001F21F5 /* AValueKeyedByKnowable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2A70B4211D0780001F21F5 /* AValueKeyedByKnowable.swift */; };
+		4E2E8D5F212C393B00A9D3A0 /* FormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2E8D5E212C393B00A9D3A0 /* FormData.swift */; };
+		4E2E8D60212C393B00A9D3A0 /* FormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2E8D5E212C393B00A9D3A0 /* FormData.swift */; };
 		4E34145C211DDC3E00C0E90D /* DictionaryKeyedByEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E34145B211DDC3E00C0E90D /* DictionaryKeyedByEnum.swift */; };
 		4E34145D211DDC3E00C0E90D /* DictionaryKeyedByEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E34145B211DDC3E00C0E90D /* DictionaryKeyedByEnum.swift */; };
 		4E34145F211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E34145E211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift */; };
@@ -39,6 +41,7 @@
 		4E2A70A2211CF7DE001F21F5 /* JSONHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelpers.swift; sourceTree = "<group>"; };
 		4E2A70A4211CF7DE001F21F5 /* MillisecondsDate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MillisecondsDate.swift; sourceTree = "<group>"; };
 		4E2A70B4211D0780001F21F5 /* AValueKeyedByKnowable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AValueKeyedByKnowable.swift; sourceTree = "<group>"; };
+		4E2E8D5E212C393B00A9D3A0 /* FormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormData.swift; sourceTree = "<group>"; };
 		4E34145B211DDC3E00C0E90D /* DictionaryKeyedByEnum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DictionaryKeyedByEnum.swift; sourceTree = "<group>"; };
 		4E34145E211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryKeyedByKnowable.swift; sourceTree = "<group>"; };
 		4E341461211DF5C200C0E90D /* AValueDictionaryKeyedByEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AValueDictionaryKeyedByEnum.swift; sourceTree = "<group>"; };
@@ -78,6 +81,7 @@
 			children = (
 				4E2A70A2211CF7DE001F21F5 /* JSONHelpers.swift */,
 				4E2A70A4211CF7DE001F21F5 /* MillisecondsDate.swift */,
+				4E2E8D5E212C393B00A9D3A0 /* FormData.swift */,
 			);
 			path = Formats;
 			sourceTree = "<group>";
@@ -278,6 +282,7 @@
 				4E2A70B5211D0780001F21F5 /* AValueKeyedByKnowable.swift in Sources */,
 				4E5B8D5421238242006A519E /* LinkedList.swift in Sources */,
 				4E34145F211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift in Sources */,
+				4E2E8D5F212C393B00A9D3A0 /* FormData.swift in Sources */,
 				4E5B8D5921239338006A519E /* NodeList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -297,6 +302,7 @@
 				4E341460211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift in Sources */,
 				4E2A70A6211CF7DE001F21F5 /* JSONHelpers.swift in Sources */,
 				4E5B8D5521238242006A519E /* LinkedList.swift in Sources */,
+				4E2E8D60212C393B00A9D3A0 /* FormData.swift in Sources */,
 				4E341466211DFC6A00C0E90D /* AValue.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

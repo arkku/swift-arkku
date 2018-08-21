@@ -158,4 +158,11 @@ for element in linkedList {
     print("\(element)")
 }
 
+// Multipart form:
+
+let fileData = "import Foundation\n\nprint(\"Hello world!\")".data(using: .utf8)!
+var formData = FormData(randomBoundaryFor: fileData)
+formData.append(value: "this is a form value", forKey: "someKey")
+formData.append(value: fileData, forKey: "file", valueFilename: "hello.swift", valueContentType: "text/plain")
+print(String(data: formData.body, encoding: .utf8)!)
 
