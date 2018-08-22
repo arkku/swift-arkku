@@ -70,7 +70,7 @@ extension MapCoded: CustomStringConvertible, CustomDebugStringConvertible {
     }
 
     public var debugDescription: String {
-        return "MapCoded(\(dictionary.debugDescription)"
+        return "Map\(dictionary.debugDescription)"
     }
 }
 
