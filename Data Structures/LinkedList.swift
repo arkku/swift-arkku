@@ -10,7 +10,7 @@
 import Foundation
 
 /// A singly-linked list with a very simple implementation.
-public enum LinkedList<ElementType>: List, Sequence, ExpressibleByArrayLiteral, Stack {
+public enum LinkedList<ElementType>: List, Sequence, ExpressibleByArrayLiteral {
     public typealias Element = ElementType
 
     case empty
@@ -20,11 +20,11 @@ public enum LinkedList<ElementType>: List, Sequence, ExpressibleByArrayLiteral, 
         self = .empty
     }
 
-    /// Make a linked list with the contents of `array`.
+    /// Make a list containing the elements of `array`.
     public init(_ array: [Element]) {
         self.init()
         for element in array.reversed() {
-            self = .node(element: element, tail: self)
+            insertAsFirst(element)
         }
     }
 
@@ -160,5 +160,21 @@ extension LinkedList: CustomDebugStringConvertible where Element: CustomDebugStr
             result = "\(result) \(element.debugDescription) ->"
         }
         return "\(result) . )"
+    }
+}
+
+// MARK: - Stack
+
+extension LinkedList: Stack {
+    public var top: ElementType? {
+        return first
+    }
+
+    public mutating func push(_ element: ElementType) {
+        insertAsFirst(element)
+    }
+
+    public mutating func pop() -> ElementType {
+        return removeFirst()
     }
 }

@@ -1,6 +1,6 @@
 //
 // NodeList.swift
-// Requires: `DataStructures.swift`
+// Requires: `DataStructures.swift`, `LinkedNodes.swift`
 //
 // Implements linked lists by using linked node objects and depth counting.
 // These implementations are heavier than the most basic linked list can be,
@@ -15,9 +15,8 @@ import Foundation
 
 /// A depth-counting singly-linked list.
 /// Depth-counting allows `Collection` conformance and O(1) `count`.
-public final class SinglyLinkedNodeList<DataType: Any>: LinkedNodeList, DepthCounting, MutableCollection {
-    public init() {
-    }
+public final class SinglyLinkedNodeList<DataType: Any>: LinkedNodeList, DepthCounting, MutableCollection, ExpressibleByArrayLiteral {
+    public init() { }
 
     public typealias Element = DataType
     public typealias Node = LinkedNode<Element>
@@ -30,13 +29,12 @@ public final class SinglyLinkedNodeList<DataType: Any>: LinkedNodeList, DepthCou
     public var tailDepth: Int = 0
 }
 
-extension SinglyLinkedNodeList: Stack, Queue { }
+extension SinglyLinkedNodeList: Queue, CustomStringConvertible { }
 
 /// A depth-counting doubly-linked list.
 /// Depth-counting allows `Collection` conformance and O(1) `count`.
-public final class DoublyLinkedList<DataType: Any>: LinkedNodeList, DepthCounting, BidirectionalCollection, MutableCollection {
-    public init() {
-    }
+public final class DoublyLinkedList<DataType: Any>: RangeReplaceableNodeList, DepthCounting, ExpressibleByArrayLiteral {
+    public required init() { }
 
     public typealias Element = DataType
     public typealias Node = DoublyLinkedNode<Element>
@@ -54,7 +52,7 @@ public final class DoublyLinkedList<DataType: Any>: LinkedNodeList, DepthCountin
     }
 }
 
-extension DoublyLinkedList: BidirectionalList, Stack, Queue { }
+extension DoublyLinkedList: Queue, CustomStringConvertible { }
 
 // MARK: - Protocols
 
@@ -116,129 +114,11 @@ public protocol DepthCounting: class {
     var tailDepth: Int { get set }
 }
 
-// MARK: - Linked Nodes
+/// A bidirectional list implemented as linked nodes.
+public protocol BidirectionalNodeList: BidirectionalList, LinkedNodeList { }
 
-/// An object with associated data. This can be used as a weak reference.
-public protocol DataReference: class {
-    associatedtype Data: Any
-
-    /// Initialize a reference to `data`.
-    init(_ data: Data)
-
-    /// The referred data.
-    var data: Data { get set }
-}
-
-/// A node with associated data.
-public class DataNode<Data: Any>: DataReference {
-    /// Initialize a node holding `data`.
-    public required init(_ data: Data) {
-        self.data = data
-    }
-
-    /// The node's data.
-    public var data: Data
-}
-
-/// A node in a linked list. Since this is a `Sequence`, it can be
-/// used as the simplest form of linked list on its own, but then
-/// the empty list becomes a special case which must be handled
-/// separately (one possibility is to use a dummy node).
-public final class LinkedNode<Data: Any>: DataNode<Data>, ForwardLinked, Sequence {
-    public var next: LinkedNode<Data>?
-}
-
-/// A doubly linked node in a linked list. The backward link, i.e.,
-/// `previous`, is a weak reference to avoid retain cycles.
-public final class DoublyLinkedNode<Data: Any>: DataNode<Data>, DoublyLinked, Sequence {
-    public var next: DoublyLinkedNode<Data>?
-    
-    public weak var previous: DoublyLinkedNode<Data>?
-}
-
-// MARK: Node Protocols
-
-/// A node that can be linked into a list.
-public protocol LinkableNode: class {
-    /// Link `node` after this node in the list.
-    func linkNext(_ node: Self?)
-}
-
-/// A node linked forward.
-public protocol ForwardLinked: LinkableNode {
-    /// The next node in the list.
-    var next: Self? { get set }
-
-    /// Unlinks the next node in the list, updating links in any
-    /// linked nodes to maintain list consistency.
-    func unlinkNext()
-}
-
-/// A node linked backward.
-public protocol BackwardLinked: LinkableNode {
-    /// The previous node in the list.
-    var previous: Self? { get set }
-}
-
-/// A node that can be unlink itself from the list while maintaining
-/// consistency of the list. This is typically the case only in a
-/// doubly linked list.
-public protocol UnlinkableNode: class {
-    /// Unlinks this node from the list, updating links of any
-    /// linked nodes to maintain list consistency.
-    func unlink()
-}
-
-/// A doubly linked node.
-public typealias DoublyLinked = ForwardLinked & BackwardLinked & UnlinkableNode
-
-// MARK: - Node Protocol Extensions
-
-public extension ForwardLinked {
-    /// Is this the last node in the list?
-    public var isLast: Bool { return next == nil }
-}
-
-public extension BackwardLinked {
-    /// Is this the first node in the list?
-    public var isFirst: Bool { return previous == nil }
-}
-
-public extension BackwardLinked where Self: ForwardLinked {
-    public func unlink() {
-        next?.previous = previous
-        previous?.next = next
-        previous = nil
-        next = nil
-    }
-}
-
-public extension ForwardLinked where Self: UnlinkableNode {
-    public func unlinkNext() {
-        print("unlinkNext passed to unlink")
-        next?.unlink()
-    }
-}
-
-public extension ForwardLinked where Self: BackwardLinked {
-    public func linkNext(_ node: Self?) {
-        node?.previous = self
-        next = node
-    }
-}
-
-public extension ForwardLinked {
-    public func linkNext(_ node: Self?) {
-        next = node
-    }
-
-    public func unlinkNext() {
-        guard let oldNext = next else { return }
-
-        next = oldNext.next
-        oldNext.next = nil
-    }
-}
+/// A range-replaceable node list.
+public protocol RangeReplaceableNodeList: BidirectionalNodeList, RangeReplaceableCollection, MutableCollection, BidirectionalCollection { }
 
 // MARK: - List Protocol Extensions
 
@@ -274,7 +154,7 @@ public extension LinkedNodeList {
 
     /// Insert `node` after `previousNode`, which must be a node in the list.
     public mutating func insert(node: Node, after previousNode: Node) {
-        if previousNode === tail {
+        guard !(previousNode === tail) else {
             append(node: node)
             return
         }
@@ -346,6 +226,20 @@ public extension LinkedNodeList where Node: BackwardLinked {
     }
 }
 
+public extension LinkedNodeList where Node: BackwardLinked & DataReference {
+    /// Insert `element` before `nextNode`, which must be a node in the list.
+    public mutating func insert(_ element: Node.DataType, beforeNode nextNode: Node) {
+        self.insert(node: Node(element), before: nextNode)
+    }
+}
+
+public extension LinkedNodeList where Node: DataReference {
+    /// Insert `element` after `previousNode`, which must be a node in the list.
+    public mutating func insert(_ element: Node.DataType, afterNode previousNode: Node) {
+        self.insert(node: Node(element), after: previousNode)
+    }
+}
+
 public extension LinkedNodeList where Node: UnlinkableNode, Node: BackwardLinked {
     /// Removes the last node in the list and returns it.
     /// If the list is empty, `nil` is returned. See also `removeLastNode()`.
@@ -398,115 +292,71 @@ public extension LinkedNodeList where Node: UnlinkableNode, Node: BackwardLinked
 
 public extension LinkedNodeList where Node: DataReference {
     /// First element in the list, or `nil` if empty.
-    public var first: Node.Data? {
+    public var first: Node.DataType? {
         return head?.data
     }
 
     /// Last element in the list, or `nil` if empty.
-    public var last: Node.Data? {
+    public var last: Node.DataType? {
         return tail?.data
     }
 }
 
+public extension LinkedNodeList where Node: DataReference, Self: ExpressibleByArrayLiteral {
+    public init(arrayLiteral elements: Element...) {
+        self.init(elements)
+    }
+}
+
 public extension LinkedNodeList where Node: DataReference {
+    /// Make a list with the contents of `array`.
+    public init(_ array: [Element]) {
+        self.init()
+        for element in array {
+            append(element)
+        }
+    }
+
     /// Insert `element` to the beginning of the list.
-    public mutating func insertAsFirst(_ element: Node.Data) {
+    public mutating func insertAsFirst(_ element: Node.DataType) {
         insertAsHead(Node(element))
     }
 
     /// Append `element` to the end of the list.
-    public mutating func append(_ element: Node.Data) {
+    public mutating func append(_ element: Node.DataType) {
         append(node: Node(element))
     }
 
     /// Removes the first element in the list and returns it.
     /// If the list is empty, `nil` is returned. See also `removeFirst()`.
     @discardableResult
-    public mutating func popFirst() -> Node.Data? {
+    public mutating func popFirst() -> Node.DataType? {
         return popFirstNode()?.data
     }
 
     /// Removes the first element in the list and returns it.
     /// The list must not be empty when called. See also `popFirst()`.
     @discardableResult
-    public mutating func removeFirst() -> Node.Data {
+    public mutating func removeFirst() -> Node.DataType {
         return removeFirstNode().data
     }
 }
 
-public extension LinkedNodeList where Node: UnlinkableNode & BackwardLinked & DataReference {
-    /// Removes the last element in the list and returns it.
-    /// If the list is empty, `nil` is returned. See also `removeLast()`.
+public extension BidirectionalNodeList where Self.Node: DataReference & BackwardLinked & UnlinkableNode {
     @discardableResult
-    public mutating func popLast() -> Node.Data? {
+    public mutating func popLast() -> Node.DataType? {
         return popLastNode()?.data
     }
 
-    /// Removes the last element in the list and returns it.
-    /// The list must not be empty when called. See also `popLast()`.
     @discardableResult
-    public mutating func removeLast() -> Node.Data {
+    public mutating func removeLast() -> Node.DataType {
         return removeLastNode().data
-    }
-}
-
-// MARK: - Iterators
-
-public struct ForwardLinkIterator<Node: ForwardLinked & DataReference>: IteratorProtocol, Sequence {
-    public init(_ startNode: Node?) {
-        position = startNode
-    }
-
-    private var position: Node?
-
-    public mutating func next() -> Node.Data? {
-        guard let node = position else { return nil }
-        position = node.next
-        return node.data
-    }
-
-    public func makeIterator() -> ForwardLinkIterator<Node> {
-        return self
-    }
-}
-
-public extension ForwardLinked where Self: DataReference {
-    public typealias ForwardIterator = ForwardLinkIterator<Self>
-
-    public func makeIterator() -> ForwardIterator {
-        return ForwardIterator(self)
-    }
-}
-
-public struct BackwardLinkIterator<Node: BackwardLinked & DataReference>: IteratorProtocol, Sequence {
-    public init(_ startNode: Node?) {
-        position = startNode
-    }
-
-    private var position: Node?
-
-    public mutating func next() -> Node.Data? {
-        guard let node = position else { return nil }
-        position = node.previous
-        return node.data
-    }
-
-    public func makeIterator() -> BackwardLinkIterator<Node> {
-        return self
-    }
-}
-
-public extension BackwardLinked where Self: DataReference {
-    public typealias BackwardIterator = BackwardLinkIterator<Self>
-
-    public func makeBackwardIterator() -> BackwardIterator {
-        return BackwardIterator(self)
     }
 }
 
 // MARK: - Sequence Conformance
 
-public extension Sequence where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.Data == Iterator.Element {
+public extension Sequence where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.DataType == Iterator.Element {
     public func makeIterator() -> ForwardLinkIterator<Node> {
         return ForwardLinkIterator<Node>(head)
     }
@@ -551,8 +401,8 @@ public extension Collection where Self: LinkedNodeList, Self: DepthCounting {
     }
 }
 
-public extension Collection where Self: LinkedNodeList, Self: DepthCounting, Self.Node: DataReference, Self.Node.Data == Iterator.Element {
-    public subscript(index: DepthIndex) -> Node.Data {
+public extension Collection where Self: LinkedNodeList, Self: DepthCounting, Self.Node: DataReference, Self.Node.DataType == Iterator.Element {
+    public subscript(index: DepthIndex) -> Node.DataType {
         get {
             return index.node!.data
         }
@@ -577,16 +427,98 @@ public extension BidirectionalCollection where Self: LinkedNodeList, Self: Depth
     }
 }
 
+public extension RangeReplaceableCollection where Self: LinkedNodeList, Self: DepthCounting, Self.Node: BackwardLinked & UnlinkableNode & DataReference {
+    public init<S>(_ elements: S) where S: Sequence, S.Element == Node.DataType {
+        self.init()
+        append(contentsOf: elements)
+    }
+
+    public mutating func append<S>(contentsOf newElements: S) where S: Sequence, S.Element == Node.DataType {
+        for element in newElements {
+            append(element)
+        }
+    }
+
+    public mutating func replaceSubrange<C>(_ subrange: Range<NodeIndex<Node>>, with newElements: C) where C: Collection, C.Element == Node.DataType {
+        switch (subrange.lowerBound.node, subrange.upperBound.node) {
+        case (let lastToRemove, nil) where lastToRemove != nil:
+            // range from some node to the end
+            while !(popLastNode() === lastToRemove) { }
+            fallthrough
+        case (nil, nil):
+            // the end of the list
+            for element in newElements { append(element) }
+        case (let firstToRemove, let lastToRemove):
+            var insertAfter = firstToRemove?.previous
+
+            var nextNode = firstToRemove ?? head
+            while let node = nextNode {
+                nextNode = node.next
+                remove(node: node)
+                if node === lastToRemove { break }
+            }
+
+            for element in newElements {
+                let newNode = Node(element)
+                if let insertionPoint = insertAfter {
+                    insert(node: newNode, after: insertionPoint)
+                } else {
+                    insertAsHead(newNode)
+                }
+                insertAfter = newNode
+            }
+        }
+    }
+}
+
+
 // These are just to avoid ambiguity with multiple default implementations:
 
 public extension Collection where Self: LinkedNodeList {
     public var isEmpty: Bool { return head == nil }
 }
 
-public extension Collection where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.Data == Self.Iterator.Element {
-    public var first: Node.Data? { return head?.data }
+public extension Collection where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.DataType == Self.Iterator.Element {
+    public var first: Node.DataType? { return head?.data }
 }
 
-public extension BidirectionalCollection where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.Data == Self.Iterator.Element {
-    public var last: Node.Data? { return tail?.data }
+public extension BidirectionalCollection where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.DataType == Self.Iterator.Element {
+    public var last: Node.DataType? { return tail?.data }
+}
+
+public extension RangeReplaceableCollection where Self: LinkedNodeList, Self.Node: DataReference {
+    public mutating func append(_ element: Node.DataType) {
+        append(node: Node(element))
+    }
+
+    @discardableResult
+    public mutating func removeFirst() -> Node.DataType {
+        return removeFirstNode().data
+    }
+}
+
+public extension RangeReplaceableNodeList where Self.Node: DataReference & BackwardLinked & UnlinkableNode {
+    @discardableResult
+    public mutating func popLast() -> Node.DataType? {
+        return popLastNode()?.data
+    }
+
+    @discardableResult
+    public mutating func removeLast() -> Node.DataType {
+        return removeLastNode().data
+    }
+}
+
+// MARK: - CustomStringConvertible
+
+extension LinkedNodeList {
+    public var description: String {
+        var result = ""
+        var nextNode = head
+        while let node = nextNode {
+            nextNode = node.next
+            result = "\(result.isEmpty ? "(" : "\(result),") \(node)"
+        }
+        return "\(result) )"
+    }
 }

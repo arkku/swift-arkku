@@ -33,8 +33,14 @@
 		4E5B8D522123733F006A519E /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D502123733F006A519E /* ArrayExtensions.swift */; };
 		4E5B8D5421238242006A519E /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D5321238242006A519E /* LinkedList.swift */; };
 		4E5B8D5521238242006A519E /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D5321238242006A519E /* LinkedList.swift */; };
-		4E5B8D5721238C24006A519E /* NodeList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D4021221AAB006A519E /* NodeList.swift */; };
-		4E5B8D5921239338006A519E /* NodeList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D4021221AAB006A519E /* NodeList.swift */; };
+		4E735A922131884C002CAD6F /* ConcatenatedInputStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E735A912131884C002CAD6F /* ConcatenatedInputStream.swift */; };
+		4E735A932131884C002CAD6F /* ConcatenatedInputStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E735A912131884C002CAD6F /* ConcatenatedInputStream.swift */; };
+		4E735A9521318C41002CAD6F /* FormDataInputStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E735A9421318C41002CAD6F /* FormDataInputStream.swift */; };
+		4E735A9621318C41002CAD6F /* FormDataInputStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E735A9421318C41002CAD6F /* FormDataInputStream.swift */; };
+		4E735A982131B88F002CAD6F /* LinkedNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E735A972131B88F002CAD6F /* LinkedNodes.swift */; };
+		4E735A992131B88F002CAD6F /* LinkedNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E735A972131B88F002CAD6F /* LinkedNodes.swift */; };
+		4E735A9C2131BAAB002CAD6F /* NodeList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D4021221AAB006A519E /* NodeList.swift */; };
+		4E735A9D2131BAAC002CAD6F /* NodeList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D4021221AAB006A519E /* NodeList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +62,9 @@
 		4E5B8D4C21221DBC006A519E /* DataStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStructures.swift; sourceTree = "<group>"; };
 		4E5B8D502123733F006A519E /* ArrayExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
 		4E5B8D5321238242006A519E /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
+		4E735A912131884C002CAD6F /* ConcatenatedInputStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcatenatedInputStream.swift; sourceTree = "<group>"; };
+		4E735A9421318C41002CAD6F /* FormDataInputStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormDataInputStream.swift; sourceTree = "<group>"; };
+		4E735A972131B88F002CAD6F /* LinkedNodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedNodes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +101,7 @@
 				4E2A70B4211D0780001F21F5 /* AValueKeyedByKnowable.swift */,
 				4E341461211DF5C200C0E90D /* AValueDictionaryKeyedByEnum.swift */,
 				4E34145E211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift */,
+				4E735A9421318C41002CAD6F /* FormDataInputStream.swift */,
 			);
 			name = Combinations;
 			sourceTree = "<group>";
@@ -130,6 +140,7 @@
 				4E50D326211BC8C0007239EE /* AValue.swift */,
 				4E34145B211DDC3E00C0E90D /* DictionaryKeyedByEnum.swift */,
 				4E50D325211BC8C0007239EE /* KnownOrUnknownString.swift */,
+				4E735A912131884C002CAD6F /* ConcatenatedInputStream.swift */,
 				4E341465211DF72700C0E90D /* Combinations */,
 			);
 			path = Wrappers;
@@ -150,6 +161,7 @@
 			children = (
 				4E5B8D4C21221DBC006A519E /* DataStructures.swift */,
 				4E5B8D5321238242006A519E /* LinkedList.swift */,
+				4E735A972131B88F002CAD6F /* LinkedNodes.swift */,
 				4E5B8D4021221AAB006A519E /* NodeList.swift */,
 				4E5B8D502123733F006A519E /* ArrayExtensions.swift */,
 			);
@@ -276,14 +288,17 @@
 				4E341462211DF5C200C0E90D /* AValueDictionaryKeyedByEnum.swift in Sources */,
 				4E50D327211BC8C0007239EE /* KnownOrUnknownString.swift in Sources */,
 				4E5B8D512123733F006A519E /* ArrayExtensions.swift in Sources */,
+				4E735A9521318C41002CAD6F /* FormDataInputStream.swift in Sources */,
 				4E50D328211BC8C0007239EE /* AValue.swift in Sources */,
 				4E2A70A5211CF7DE001F21F5 /* JSONHelpers.swift in Sources */,
 				4E2A70A9211CF7DE001F21F5 /* MillisecondsDate.swift in Sources */,
 				4E2A70B5211D0780001F21F5 /* AValueKeyedByKnowable.swift in Sources */,
 				4E5B8D5421238242006A519E /* LinkedList.swift in Sources */,
+				4E735A9C2131BAAB002CAD6F /* NodeList.swift in Sources */,
+				4E735A922131884C002CAD6F /* ConcatenatedInputStream.swift in Sources */,
+				4E735A982131B88F002CAD6F /* LinkedNodes.swift in Sources */,
 				4E34145F211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift in Sources */,
 				4E2E8D5F212C393B00A9D3A0 /* FormData.swift in Sources */,
-				4E5B8D5921239338006A519E /* NodeList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,12 +310,15 @@
 				4E2A70B6211D0780001F21F5 /* AValueKeyedByKnowable.swift in Sources */,
 				4E2A70AA211CF7DE001F21F5 /* MillisecondsDate.swift in Sources */,
 				4E341467211DFC6D00C0E90D /* KnownOrUnknownString.swift in Sources */,
-				4E5B8D5721238C24006A519E /* NodeList.swift in Sources */,
+				4E735A9621318C41002CAD6F /* FormDataInputStream.swift in Sources */,
 				4E5B8D522123733F006A519E /* ArrayExtensions.swift in Sources */,
 				4E34145D211DDC3E00C0E90D /* DictionaryKeyedByEnum.swift in Sources */,
 				4E341463211DF5C200C0E90D /* AValueDictionaryKeyedByEnum.swift in Sources */,
 				4E341460211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift in Sources */,
 				4E2A70A6211CF7DE001F21F5 /* JSONHelpers.swift in Sources */,
+				4E735A932131884C002CAD6F /* ConcatenatedInputStream.swift in Sources */,
+				4E735A9D2131BAAC002CAD6F /* NodeList.swift in Sources */,
+				4E735A992131B88F002CAD6F /* LinkedNodes.swift in Sources */,
 				4E5B8D5521238242006A519E /* LinkedList.swift in Sources */,
 				4E2E8D60212C393B00A9D3A0 /* FormData.swift in Sources */,
 				4E341466211DFC6A00C0E90D /* AValue.swift in Sources */,

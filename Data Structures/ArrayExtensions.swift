@@ -21,7 +21,7 @@ extension Array: BidirectionalList {
 
 extension Array: Stack {
     public var top: Element? {
-        return first
+        return last
     }
 
     public mutating func push(_ element: Element) {

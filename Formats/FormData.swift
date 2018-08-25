@@ -78,6 +78,26 @@ public struct FormData: CustomDebugStringConvertible {
         self.init(boundary: boundary)
     }
 
+    /// Append the keys and values from a dictionary.
+    @discardableResult
+    public mutating func append(_ keysAndValues: [String: Data]) -> Bool {
+        var success = true
+        for (key, value) in keysAndValues {
+            if !append(value: value, forKey: key) { success = false }
+        }
+        return success
+    }
+
+    /// Append the keys and values from a dictionary.
+    @discardableResult
+    public mutating func append(_ keysAndValues: [String: String]) -> Bool {
+        var success = true
+        for (key, value) in keysAndValues {
+            if !append(value: value, forKey: key) { success = false }
+        }
+        return success
+    }
+
     /// Append `value` for `key` into the form.
     ///
     /// Returns `true` on success, `false` on failure (e.g., either of key or
@@ -94,8 +114,8 @@ public struct FormData: CustomDebugStringConvertible {
     /// valid UTF-8 string, or either the key or the value contain `boundary`).
     @discardableResult
     public mutating func append(value: Data, forKey key: String, valueFilename filename: String? = nil, valueContentType contentType: String? = nil, checkForBoundaryInValue: Bool = true) -> Bool {
-        guard append(keyOnly: key, filename: filename, contentType: contentType) else { return false }
         guard !checkForBoundaryInValue || value.range(of: boundary) == nil else { return false }
+        guard append(keyOnly: key, filename: filename, contentType: contentType) else { return false }
         header.append(value)
         return true
     }

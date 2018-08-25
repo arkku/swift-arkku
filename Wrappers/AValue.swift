@@ -103,18 +103,20 @@ public enum AValue: Codable {
             self = valuable.asValue
         case let value as AValue:
             self = value
+        case let dictionary as [String: Any]:
+            guard let valueDictionary: [String: AValue] = (try? dictionary.mapValues { anyValue in
+                guard let value = AValue(anyValue) else { throw ValueError() }
+                return value
+                }) else { return nil }
+            self = .dictionary(valueDictionary)
+        case let sequence as AnySequence<Valuable>:
+            self = .array(sequence.map { $0.asValue })
         case let array as [Any]:
             guard let valueArray: [AValue] = (try? array.map { element in
                 guard let value = AValue(element) else { throw ValueError() }
                 return value
             }) else { return nil }
             self = .array(valueArray)
-        case let dictionary as [String: Any]:
-            guard let valueDictionary: [String: AValue] = (try? dictionary.mapValues { anyValue in
-                guard let value = AValue(anyValue) else { throw ValueError() }
-                return value
-            }) else { return nil }
-            self = .dictionary(valueDictionary)
         default:
             return nil
         }
@@ -747,12 +749,13 @@ extension Data {
 
 // MARK: - CodedAsValue
 
-/// As `ValueCodable`, but with a default implementation of `Codable`
-/// provided by wrapping as `AValue`. Simply declare both `CodedAsValue`
-/// and `Codable`.
-public protocol CodedAsValue: ValueCodable { }
+/// As `CodedAsValue` has default implementations for `Encodable` and
+/// `Decodable`.
+public protocol ValueEncodable: Valuable, Encodable { }
+public protocol ValueDecodable: Devaluable, Decodable { }
+public typealias CodedAsValue = ValueEncodable & ValueDecodable
 
-public extension CodedAsValue {
+public extension ValueDecodable {
     public init(from decoder: Decoder) throws {
         let value = try AValue(from: decoder)
         guard let unwrapped = Self(unwrapping: value) else {
@@ -760,7 +763,9 @@ public extension CodedAsValue {
         }
         self = unwrapped
     }
+}
 
+public extension ValueEncodable {
     public func encode(to encoder: Encoder) throws {
         try asValue.encode(to: encoder)
     }

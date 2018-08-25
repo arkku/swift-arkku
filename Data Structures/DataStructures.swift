@@ -84,7 +84,6 @@ public protocol List {
 
     /// Inserts `element` into the list as the new `first`.
     mutating func insertAsFirst(_ element: Element)
-
 }
 
 /// A list that provides O(1) operations for accessing the last element
@@ -113,24 +112,18 @@ public protocol BidirectionalList: AppendableList {
 
 }
 
-// MARK: - Default Implementations
+/// An object with associated data. This can be used as a weak reference.
+public protocol DataReference: class {
+    associatedtype DataType: Any
 
-// Default implementation of `Stack` as a `List`.
-extension Stack where Self: List {
+    /// Initialize a reference to `data`.
+    init(_ data: DataType)
 
-    public var top: Self.Element? {
-        return first
-    }
-
-    public mutating func push(_ element: Self.Element) {
-        insertAsFirst(element)
-    }
-
-    public mutating func pop() -> Self.Element {
-        return removeFirst()
-    }
-
+    /// The referred data.
+    var data: DataType { get set }
 }
+
+// MARK: - Default Implementations
 
 // Default implementation of `Queue` as a `AppendableList`.
 extension Queue where Self: AppendableList {

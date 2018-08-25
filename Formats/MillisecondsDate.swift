@@ -5,8 +5,8 @@
 // milliseconds since 1970. This is consistent with the JSON encoder
 // `dateEncodingStrategy` of `millisecondsSince1970`. The intent is
 // that if the date thus encoded ends up being decoded into an integer
-// or floating point value, such as when it is a member of a dynamic
-// structure, these helpers make it easy to convert back to `Date`.
+// or floating point value – such as when it is a member of a dynamic
+// structure – these helpers make it easy to convert back to `Date`.
 //
 // Copyright © 2018 Kimmo Kulovesi, https://github.com/arkku/
 //
@@ -31,6 +31,6 @@ public extension Date {
 
     /// Integer milliseconds since 1970.
     public var integerMillisecondsSince1970: Int64 {
-        return Int64(millisecondsSince1970)
+        return Int64(timeIntervalSince1970 * 1000)
     }
 }
