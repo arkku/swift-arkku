@@ -59,10 +59,12 @@ public extension BackwardLinked {
 
 public extension BackwardLinked where Self: ForwardLinked {
     public func unlink() {
-        next?.previous = previous
-        previous?.next = next
-        previous = nil
+        let oldPrevious = previous
+        let oldNext = next
+        oldPrevious?.next = next
         next = nil
+        oldNext?.previous = oldPrevious
+        previous = nil
     }
 }
 
@@ -77,6 +79,17 @@ public extension ForwardLinked where Self: BackwardLinked {
         node?.previous = self
         next = node
     }
+
+    public func linkAfter(_ previousNode: Self) {
+        linkNext(previousNode.next)
+        previousNode.linkNext(self)
+    }
+
+    public func linkBefore(_ nextNode: Self) {
+        let previousNode = nextNode.previous
+        linkNext(nextNode)
+        previousNode?.linkNext(self)
+    }
 }
 
 public extension ForwardLinked {
@@ -89,6 +102,10 @@ public extension ForwardLinked {
 
         next = oldNext.next
         oldNext.next = nil
+    }
+
+    public func linkBefore(_ nextNode: Self) {
+        linkNext(nextNode)
     }
 }
 
@@ -171,10 +188,77 @@ public final class LinkedNode<DataType: Any>: DataNode<DataType>, ForwardLinked,
     public var next: LinkedNode<DataType>?
 }
 
-/// A doubly linked node in a linked list. The backward link, i.e.,
+/// A doubly-linked node in a linked list. The backward link, i.e.,
 /// `previous`, is a weak reference to avoid retain cycles.
 public final class DoublyLinkedNode<DataType: Any>: DataNode<DataType>, DoublyLinked, Sequence {
     public var next: DoublyLinkedNode<DataType>?
 
     public weak var previous: DoublyLinkedNode<DataType>?
+}
+
+/// A doubly-linked node that may also be a sentinel node, i.e., an empty node
+/// at the beginning and the end of the list to simplify implementation.
+public final class NodeOrSentinel<DataType: Any>: DataReference, DoublyLinked, Sequence, CustomStringConvertible {
+    public var next: NodeOrSentinel<DataType>?
+
+    public weak var previous: NodeOrSentinel<DataType>?
+
+    /// The data element, or `nil` if this is a sentinel node.
+    public var element: DataType?
+
+    /// Is this a sentinel node without data?
+    public var isSentinel: Bool {
+        return element == nil
+    }
+
+    /// Prepare a sentinel node.
+    public required init() {
+        self.element = nil
+    }
+
+    /// Prepare a node with `data`.
+    public required init(_ data: DataType) {
+        self.element = data
+    }
+
+    /// The data element of this node. Accessing this on a sentinel node
+    /// is a runtime error (see `isSentinel` and `element`).
+    public var data: DataType {
+        get { return element! }
+        set { element = newValue }
+    }
+
+    public var description: String {
+        return isSentinel ? "||" : "\(data)"
+    }
+
+    public struct Iterator: IteratorProtocol, Sequence {
+        public mutating func next() -> DataType? {
+            guard let data = position.element else { return nil }
+            position = position.next!
+            return data
+        }
+
+        var position: NodeOrSentinel<DataType>
+    }
+
+    public typealias BackwardIterator = ReverseIterator
+
+    public struct ReverseIterator: IteratorProtocol, Sequence {
+        public mutating func next() -> DataType? {
+            guard let data = position.element else { return nil }
+            position = position.previous!
+            return data
+        }
+
+        var position: NodeOrSentinel<DataType>
+    }
+
+    public func makeIterator() -> Iterator {
+        return Iterator(position: self)
+    }
+
+    public func makeBackwardIterator() -> BackwardIterator {
+        return ReverseIterator(position: self)
+    }
 }

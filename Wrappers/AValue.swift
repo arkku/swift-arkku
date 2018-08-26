@@ -85,6 +85,11 @@ public enum AValue: Codable {
     /// A dictionary of values with string keys.
     case dictionary([String: AValue])
 
+    /// A dictionary of values with `Int` keys.
+    /// This case is the least supported, as most extensions are made for the
+    /// string-keyed dictionaries.
+    case mapInt([Int: AValue])
+
     /// A boolean value.
     case boolean(Bool)
 
@@ -95,20 +100,26 @@ public enum AValue: Codable {
     /// `asValue` on the array itself.
     public init?(_ value: Any) {
         switch value {
+        case let value as AValue:
+            self = value
         case let byteArray as [UInt8]:
             // As a special case, an array of `UInt8` turns into `data`, instead of
             // an `array`. It is possible to circumvent this with `asValue`.
             self = .data(Data(byteArray))
         case let valuable as Valuable:
             self = valuable.asValue
-        case let value as AValue:
-            self = value
         case let dictionary as [String: Any]:
             guard let valueDictionary: [String: AValue] = (try? dictionary.mapValues { anyValue in
                 guard let value = AValue(anyValue) else { throw ValueError() }
                 return value
                 }) else { return nil }
             self = .dictionary(valueDictionary)
+        case let dictionary as [Int: Any]:
+            guard let valueDictionary: [Int: AValue] = (try? dictionary.mapValues { anyValue in
+                guard let value = AValue(anyValue) else { throw ValueError() }
+                return value
+                }) else { return nil }
+            self = .mapInt(valueDictionary)
         case let sequence as AnySequence<Valuable>:
             self = .array(sequence.map { $0.asValue })
         case let array as [Any]:
@@ -140,6 +151,8 @@ public enum AValue: Codable {
             self = .date(date)
         } else if let data = try? container.decode(Data.self) {
             self = .data(data)
+        } else if let dictionary = try? container.decode([Int: AValue].self) {
+            self = .mapInt(dictionary)
         } else {
             throw DecodingError.valueNotFound(AValue.self,
                 .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode value"))
@@ -157,6 +170,7 @@ public enum AValue: Codable {
         case .dictionary(let dict): try container.encode(dict)
         case .array(let array):     try container.encode(array)
         case .boolean(let bool):    try container.encode(bool)
+        case .mapInt(let dict):     try container.encode(dict)
         }
     }
 
@@ -182,6 +196,8 @@ public enum AValue: Codable {
             return array.map { $0.anyValue } as [Any]
         case .dictionary(let dictionary):
             return dictionary.mapValues { $0.anyValue } as [String: Any]
+        case .mapInt(let dictionary):
+            return dictionary.mapValues { $0.anyValue } as [Int: Any]
         case .boolean(let bool):
             return bool as Any
         }
@@ -278,6 +294,12 @@ public enum AValue: Codable {
         return value
     }
 
+    /// The associated integer map value, or `nil` if this is not such a value.
+    public var mapIntValue: [Int: AValue]? {
+        guard case .mapInt(let value) = self else { return nil }
+        return value
+    }
+
     /// The associated boolean value, or the boolean value of the integer or
     /// string value.
     ///
@@ -297,8 +319,8 @@ public enum AValue: Codable {
             }
         case .string(let string):
             switch string {
-            case "0", "false":  return false
-            case "1", "true":   return true
+            case "", "false":   return false
+            case "true":        return true
             default:            return nil
             }
         default:
@@ -306,7 +328,9 @@ public enum AValue: Codable {
         }
     }
 
-    fileprivate struct ValueError: Error { }
+    fileprivate struct ValueError: Error, CustomStringConvertible {
+        var description: String { return "Invalid type for AValue" }
+    }
 }
 
 extension AValue: CustomStringConvertible, CustomDebugStringConvertible {
@@ -319,6 +343,7 @@ extension AValue: CustomStringConvertible, CustomDebugStringConvertible {
         case .data(let data): return data.description
         case .array(let array): return array.description
         case .dictionary(let dictionary): return dictionary.description
+        case .mapInt(let dictionary): return dictionary.description
         case .boolean(let bool): return String(bool)
         }
     }
@@ -332,6 +357,7 @@ extension AValue: CustomStringConvertible, CustomDebugStringConvertible {
         case .data(let data): return data.debugDescription
         case .array(let array): return array.debugDescription
         case .dictionary(let dictionary): return dictionary.debugDescription
+        case .mapInt(let dictionary): return dictionary.debugDescription
         case .boolean(let bool): return bool.description
         }
     }
@@ -560,6 +586,34 @@ extension Dictionary where Key: RawRepresentable, Key.RawValue == String, Value:
     }
 }
 
+extension Dictionary where Key == Int, Value == AValue {
+    public var asValue: AValue {
+        return AValue.mapInt(self)
+    }
+}
+
+extension Dictionary where Key == Int, Value: Valuable {
+    public var asValue: AValue {
+        return AValue.mapInt(mapValues { $0.asValue })
+    }
+}
+
+extension Dictionary where Key: RawRepresentable, Key.RawValue == Int, Value == AValue {
+    public var asValue: AValue {
+        return AValue.mapInt(
+            [Int: AValue](uniqueKeysWithValues: map { (key: $0.rawValue, value: $1) })
+        )
+    }
+}
+
+extension Dictionary where Key: RawRepresentable, Key.RawValue == Int, Value: Valuable {
+    public var asValue: AValue {
+        return AValue.mapInt(
+            [Int: AValue](uniqueKeysWithValues: map { (key: $0.rawValue, value: $1.asValue) })
+        )
+    }
+}
+
 /// Types that are `RawRepresentable` as `String` can conform to
 /// `StringRepresentable` (for free) to make dictionaries keyed by them
 /// automatically `ValueCodable`.
@@ -572,9 +626,7 @@ extension String: StringRepresentable {
         self.init(rawValue)
     }
 
-    public var rawValue: String {
-        return self
-    }
+    public var rawValue: String { return self }
 }
 
 extension Dictionary: Valuable where Key: StringRepresentable, Value: Valuable { }
@@ -589,6 +641,21 @@ extension Dictionary where Key: RawRepresentable, Key.RawValue == String, Value:
             guard let unwrappedValue: Value = wrappedValue.unwrapped() else { throw AValue.ValueError() }
             return (key: convertedKey, value: unwrappedValue)
         }) else { return nil }
+
+        self.init(uniqueKeysWithValues: keysAndValues)
+    }
+}
+
+extension Dictionary where Key: RawRepresentable, Key.RawValue == Int, Value: Devaluable {
+    /// Init by unwrapping the dictionary `value`.
+    public init?(unwrapping value: AValue) {
+        guard let dictionary = value.mapIntValue else { return nil }
+
+        guard let keysAndValues: [(key: Key, value: Value)] = (try? dictionary.map { key, wrappedValue in
+            guard let convertedKey = Key(rawValue: key) else { throw AValue.ValueError() }
+            guard let unwrappedValue: Value = wrappedValue.unwrapped() else { throw AValue.ValueError() }
+            return (key: convertedKey, value: unwrappedValue)
+            }) else { return nil }
 
         self.init(uniqueKeysWithValues: keysAndValues)
     }
@@ -708,6 +775,20 @@ extension Dictionary where Key == String, Value: Devaluable {
     /// Init by unwrapping the dictionary `value`.
     public init?(unwrapping value: AValue) {
         guard let dictionary = value.dictionaryValue else { return nil }
+
+        guard let converted: [Key: Value] = (try? dictionary.mapValues { wrappedValue in
+            guard let unwrappedValue: Value = wrappedValue.unwrapped() else { throw AValue.ValueError() }
+            return unwrappedValue
+            }) else { return nil }
+
+        self = converted
+    }
+}
+
+extension Dictionary where Key == Int, Value: Devaluable {
+    /// Init by unwrapping the dictionary `value`.
+    public init?(unwrapping value: AValue) {
+        guard let dictionary = value.mapIntValue else { return nil }
 
         guard let converted: [Key: Value] = (try? dictionary.mapValues { wrappedValue in
             guard let unwrappedValue: Value = wrappedValue.unwrapped() else { throw AValue.ValueError() }

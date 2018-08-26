@@ -112,7 +112,7 @@ public protocol BidirectionalList: AppendableList {
 
 }
 
-/// An object with associated data. This can be used as a weak reference.
+/// An object with associated data.
 public protocol DataReference: class {
     associatedtype DataType: Any
 

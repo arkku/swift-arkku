@@ -11,29 +11,18 @@
 
 import Foundation
 
-// MARK: - Linked Lists
-
-/// A depth-counting singly-linked list.
-/// Depth-counting allows `Collection` conformance and O(1) `count`.
-public final class SinglyLinkedNodeList<DataType: Any>: LinkedNodeList, DepthCounting, MutableCollection, ExpressibleByArrayLiteral {
-    public init() { }
-
-    public typealias Element = DataType
-    public typealias Node = LinkedNode<Element>
-    public typealias Iterator = ForwardLinkIterator<Node>
-
-    public var head: Node?
-    public weak var tail: Node?
-
-    public var headDepth: Int = 0
-    public var tailDepth: Int = 0
-}
-
-extension SinglyLinkedNodeList: Queue, CustomStringConvertible { }
+// MARK: - Doubly-Linked List
 
 /// A depth-counting doubly-linked list.
-/// Depth-counting allows `Collection` conformance and O(1) `count`.
-public final class DoublyLinkedList<DataType: Any>: RangeReplaceableNodeList, DepthCounting, ExpressibleByArrayLiteral {
+///
+/// Note that even though technically possible, one must not modify the list
+/// by linking or unlinking nodes manually. Doing so will break depth-counting
+/// as well as the `head` and `tail` links. Instead use the collection's
+/// methods to insert, append, and/or remove nodes.
+///
+/// Depth-counting allows conformance to `RangeReplaceableCollection` as well
+/// as O(1) `count`.
+public final class DoublyLinkedList<DataType: Any>: RangeReplaceableNodeList, DepthCounting, Queue, CustomStringConvertible, ExpressibleByArrayLiteral {
     public required init() { }
 
     public typealias Element = DataType
@@ -50,9 +39,68 @@ public final class DoublyLinkedList<DataType: Any>: RangeReplaceableNodeList, De
     public func makeReverseIterator() -> ReverseIterator {
         return ReverseIterator(tail)
     }
+
+    public var description: String {
+        var result = ""
+        var nextNode = head
+        while let node = nextNode {
+            nextNode = node.next
+            result = "\(result.isEmpty ? "(" : "\(result),") \(node)"
+        }
+        return "\(result.isEmpty ? "(" : result) )"
+    }
 }
 
-extension DoublyLinkedList: Queue, CustomStringConvertible { }
+/// A depth-counting doubly-linked list of nodes.
+///
+/// This implementation uses sentinel nodes at the head and tail of the list,
+/// which makes the implementation simpler and generally faster, but it means
+/// that it is not possible to manually iterate through the `next` and
+/// `previous` links of nodes without checking `isSentinel`. Attempting to
+/// access the `data` of a sentinel node crashes the program!
+///
+/// Note that even though technically possible, one should not modify the list
+/// by linking or unlinking nodes manually. Doing so will break depth-counting.
+/// Instead use the collection's methods to insert, append, and/or remove nodes.
+///
+/// Depth-counting allows conformance to `RangeReplaceableCollection` as well
+/// as O(1) `count`.
+public final class NodeList<DataType: Any>: SentinelNodeList, RangeReplaceableNodeList, DepthCounting, Queue, CustomStringConvertible, ExpressibleByArrayLiteral {
+    public typealias Element = DataType
+    public typealias Node = NodeOrSentinel<Element>
+
+    public init() {
+        headSentinel.linkNext(tailSentinel)
+    }
+
+    public let headSentinel = Node()
+    public let tailSentinel = Node()
+
+    public var headDepth: Int = 0
+    public var tailDepth: Int = 0
+
+    public var description: String {
+        var result = ""
+        for element in self {
+            result = "\(result.isEmpty ? "(" : "\(result),") \(element)"
+        }
+        return "\(result.isEmpty ? "(" : result) )"
+    }
+
+    public func reverse() {
+        var node: Node? = headSentinel
+        var previous: Node? = nil
+        while let n = node {
+            node = n.next
+            n.linkNext(previous)
+            previous = n
+        }
+        headSentinel.previous?.linkNext(tailSentinel)
+        headSentinel.linkNext(tailSentinel.next)
+        tailSentinel.next = nil
+        headSentinel.previous = nil
+    }
+}
 
 // MARK: - Protocols
 
@@ -120,19 +168,125 @@ public protocol BidirectionalNodeList: BidirectionalList, LinkedNodeList { }
 /// A range-replaceable node list.
 public protocol RangeReplaceableNodeList: BidirectionalNodeList, RangeReplaceableCollection, MutableCollection, BidirectionalCollection { }
 
+/// A linked list of nodes where two sentinel nodes are used to simplify the
+/// implementation; these permanent nodes at the ends of the list do not
+/// carry data and must never be removed.
+public protocol SentinelNodeList: LinkedNodeList where Node: NodeOrSentinel<Element> {
+    var headSentinel: Node { get }
+    var tailSentinel: Node { get }
+}
+
 // MARK: - List Protocol Extensions
+
+public extension SentinelNodeList where Self: DepthCounting, Self.Node == NodeOrSentinel<Element> {
+    public var head: Node? {
+        get {
+            if let headNode = headSentinel.next, !headNode.isSentinel {
+                return headNode
+            }
+            return nil
+        }
+        set {
+            if let newHead = newValue {
+                newHead.linkNext(headSentinel.next!)
+                headSentinel.linkNext(newHead)
+            } else {
+                removeAll()
+            }
+        }
+    }
+
+    public weak var tail: Node? {
+        get {
+            if let tailNode = tailSentinel.previous, !tailNode.isSentinel {
+                return tailNode
+            }
+            return nil
+        }
+        set {
+            if let newTail = newValue {
+                tailSentinel.previous!.linkNext(newTail)
+                newTail.linkNext(tailSentinel)
+            } else {
+                removeAll()
+            }
+        }
+    }
+
+    public typealias Iterator = Node.Iterator
+    public typealias ReverseIterator = Node.ReverseIterator
+
+    public func makeIterator() -> Iterator {
+        return Iterator(position: headSentinel.next!)
+    }
+
+    public func makeReverseIterator() -> ReverseIterator {
+        return ReverseIterator(position: tailSentinel.previous!)
+    }
+
+    public mutating func insertAsHead(_ node: Node) {
+        assert(!node.isSentinel)
+        node.linkAfter(headSentinel)
+        headDepth -= 1
+    }
+
+    public mutating func append(node: Node) {
+        assert(!node.isSentinel)
+        node.linkBefore(tailSentinel)
+        tailDepth += 1
+    }
+
+    public mutating func insert(node: Node, after previousNode: Node) {
+        assert(!(previousNode === tailSentinel))
+        node.linkAfter(previousNode)
+        tailDepth += 1
+    }
+
+    public mutating func insert(node: Node, before nextNode: Node) {
+        assert(!(nextNode === headSentinel))
+        node.linkBefore(nextNode)
+        headDepth -= 1
+    }
+
+    public mutating func remove(node: Node) {
+        assert(!node.isSentinel)
+        node.unlink()
+        tailDepth -= 1
+    }
+
+    @discardableResult
+    public mutating func popFirstNode() -> Node? {
+        guard let firstNode = headSentinel.next, !firstNode.isSentinel else { return nil }
+        firstNode.unlink()
+        headDepth += 1
+        return firstNode
+    }
+
+    @discardableResult
+    public mutating func popLastNode() -> Node? {
+        guard let lastNode = tailSentinel.previous, !lastNode.isSentinel else { return nil }
+        lastNode.unlink()
+        tailDepth -= 1
+        return lastNode
+    }
+
+    public mutating func removeAll() {
+        headSentinel.linkNext(tailSentinel)
+        headDepth = 0
+        tailDepth = 0
+    }
+}
 
 public extension LinkedNodeList {
     /// Is the list empty?
     public var isEmpty: Bool { return head == nil }
 
     public mutating func insertAsHead(_ node: Node) {
-        if let oldHead = head {
-            node.linkNext(oldHead)
-        } else {
+        node.linkNext(head)
+        head = node
+        if tail == nil {
             tail = node // The list was empty
         }
-        head = node
 
         if let depthCounting = self as? DepthCounting {
             depthCounting.headDepth -= 1
@@ -177,28 +331,19 @@ public extension LinkedNodeList {
         }
     }
 
-    /// Reverse the order of the list.
-    public mutating func reverse() {
-        var node = head
-        var previous: Node? = nil
-        while let n = node {
-            node = n.next
-            n.linkNext(previous)
-            previous = n
-        }
-        let tmp = head
-        head = tail
-        tail = tmp
-    }
-
     @discardableResult
     public mutating func popFirstNode() -> Node? {
-        guard let firstNode = head else { return nil }
+        guard let oldHead = head else { return nil }
 
-        head = firstNode.next
-        firstNode.unlinkNext()
-
-        if head == nil {
+        if let newHead = oldHead.next {
+            if let oldHead = oldHead as? UnlinkableNode {
+                oldHead.unlink()
+            } else {
+                oldHead.next = nil
+            }
+            head = newHead
+        } else {
+            head = nil
             tail = nil
         }
 
@@ -206,7 +351,7 @@ public extension LinkedNodeList {
             depthCounting.headDepth += 1
         }
 
-        return firstNode
+        return oldHead
     }
 
     @discardableResult
@@ -240,18 +385,19 @@ public extension LinkedNodeList where Node: DataReference {
     }
 }
 
-public extension LinkedNodeList where Node: UnlinkableNode, Node: BackwardLinked {
+public extension LinkedNodeList where Node: UnlinkableNode & BackwardLinked {
     /// Removes the last node in the list and returns it.
     /// If the list is empty, `nil` is returned. See also `removeLastNode()`.
     @discardableResult
     public mutating func popLastNode() -> Node? {
         guard let lastNode = tail else { return nil }
 
-        tail = lastNode.previous
-        lastNode.unlink()
-
-        if tail == nil {
+        if let newTail = lastNode.previous {
+            lastNode.unlink()
+            tail = newTail
+        } else {
             head = nil
+            tail = nil
         }
 
         if let depthCounting = self as? DepthCounting {
@@ -440,37 +586,51 @@ public extension RangeReplaceableCollection where Self: LinkedNodeList, Self: De
     }
 
     public mutating func replaceSubrange<C>(_ subrange: Range<NodeIndex<Node>>, with newElements: C) where C: Collection, C.Element == Node.DataType {
-        switch (subrange.lowerBound.node, subrange.upperBound.node) {
-        case (let lastToRemove, nil) where lastToRemove != nil:
-            // range from some node to the end
-            while !(popLastNode() === lastToRemove) { }
-            fallthrough
-        case (nil, nil):
-            // the end of the list
+        var position = subrange.lowerBound.node ?? head
+        let lastToRemove = subrange.upperBound.node?.previous ?? tail
+        if position === head && lastToRemove === tail {
+            removeAll()
             for element in newElements { append(element) }
-        case (let firstToRemove, let lastToRemove):
-            var insertAfter = firstToRemove?.previous
+            return
+        }
 
-            var nextNode = firstToRemove ?? head
-            while let node = nextNode {
-                nextNode = node.next
-                remove(node: node)
-                if node === lastToRemove { break }
-            }
+        var insertAfter = position?.previous
 
-            for element in newElements {
-                let newNode = Node(element)
-                if let insertionPoint = insertAfter {
-                    insert(node: newNode, after: insertionPoint)
-                } else {
-                    insertAsHead(newNode)
-                }
-                insertAfter = newNode
+        while let node = position {
+            position = node.next
+            remove(node: node)
+            if node === lastToRemove { break }
+        }
+        for element in newElements {
+            let newNode = Node(element)
+            if let insertAfter = insertAfter {
+                insert(node: newNode, after: insertAfter)
+            } else {
+                insertAsHead(newNode)
             }
+            insertAfter = newNode
         }
     }
 }
 
+public extension RangeReplaceableNodeList where Self: SentinelNodeList, Self: DepthCounting, Self.Node == NodeOrSentinel<Element> {
+    public var isEmpty: Bool { return headSentinel.next === tailSentinel }
+
+    public mutating func replaceSubrange<C>(_ subrange: Range<NodeIndex<Node>>, with newElements: C) where C: Collection, C.Element == Self.Element {
+        var insertAfter = subrange.lowerBound.node?.previous ?? headSentinel
+        var position = insertAfter.next
+        let endBefore = subrange.upperBound.node ?? tailSentinel
+        while let node = position, !(node === endBefore) {
+            position = node.next
+            remove(node: node)
+        }
+        for element in newElements {
+            let newNode = Node(element)
+            insert(node: newNode, after: insertAfter)
+            insertAfter = newNode
+        }
+    }
+}
 
 // These are just to avoid ambiguity with multiple default implementations:
 
@@ -506,19 +666,5 @@ public extension RangeReplaceableNodeList where Self.Node: DataReference & Backw
     @discardableResult
     public mutating func removeLast() -> Node.DataType {
         return removeLastNode().data
-    }
-}
-
-// MARK: - CustomStringConvertible
-
-extension LinkedNodeList {
-    public var description: String {
-        var result = ""
-        var nextNode = head
-        while let node = nextNode {
-            nextNode = node.next
-            result = "\(result.isEmpty ? "(" : "\(result),") \(node)"
-        }
-        return "\(result) )"
     }
 }

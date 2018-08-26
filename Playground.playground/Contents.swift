@@ -1,5 +1,6 @@
 import Foundation
 import PlaygroundSupport
+import CoreGraphics
 import SwiftArkku
 
 /*:
@@ -219,19 +220,35 @@ for element in linkedList {
  `MutableCollection`, `BidirectionalCollection`, and other such protocols.
 */
 
-var doublyLinkedList: DoublyLinkedList = [ 1, 2, 3, 4 ]
-var nextIteration = doublyLinkedList.tail
-while let node = nextIteration {
-    nextIteration = node.previous
-    if node.data == 2 {
-        doublyLinkedList.remove(node: node)
-    }
-}
+var doublyLinkedList: NodeList = [ 1, 2, 3, 4 ]
 doublyLinkedList.insertAsFirst(0)
 for i in 5...10 { doublyLinkedList.append(i) }
 doublyLinkedList.randomElement()
 doublyLinkedList.removeAll { $0 % 2 == 0 }
 doublyLinkedList
+doublyLinkedList.replaceSubrange(doublyLinkedList.startIndex..<doublyLinkedList.endIndex, with: [ 1, 2, 3, 4 ])
+doublyLinkedList.replaceSubrange(doublyLinkedList.startIndex..<doublyLinkedList.index(before: doublyLinkedList.endIndex), with: [ 11, 22, 33, 44 ])
+doublyLinkedList.replaceSubrange(doublyLinkedList.index(after: doublyLinkedList.startIndex)..<doublyLinkedList.endIndex, with: [ 111, 222, 333, 444 ])
+doublyLinkedList.replaceSubrange(doublyLinkedList.index(after: doublyLinkedList.startIndex)..<doublyLinkedList.index(before: doublyLinkedList.endIndex), with: [ 2, 33 ])
+doublyLinkedList.count // O(1) count
+doublyLinkedList.removeAll() // O(1) removeAll
+doublyLinkedList.count
+doublyLinkedList.append(1) // O(1) append
+doublyLinkedList.reverse()
+doublyLinkedList.append(0)
+doublyLinkedList.reverse()
+doublyLinkedList.insertAsFirst(0) // O(1) insert at any position
+doublyLinkedList.reverse()
+doublyLinkedList.reverse()
+doublyLinkedList.insertAsFirst(1)
+for element in doublyLinkedList.makeReverseIterator() {
+    // By being careful, it is possible to modify the list during iteration
+    doublyLinkedList.append(element)
+}
+for element in doublyLinkedList {
+    doublyLinkedList.insertAsFirst(element)
+}
+print("\(doublyLinkedList)")
 
 /*:
  ## Multipart Form Data
@@ -242,9 +259,11 @@ doublyLinkedList
 
 let fileURL = Bundle.main.url(forResource: "Hello", withExtension: "swift")!
 let fileData = try! Data(contentsOf: fileURL)
+
+//: A random boundary may be created that does not occur in some given data.
 var formData = FormData(randomBoundaryFor: fileData)
 
-//: Keys and values may be appended in any order.
+//: The order of keys is preserved, as this is required for some forms.
 formData.append(value: "this is a form value", forKey: "someKey")
 formData.append(value: "123".data(using: .utf8)!, forKey: "oneTwoThree")
 
@@ -269,8 +288,130 @@ formData.append(keyOnly: "file", filename: "Hello.swift", contentType: "text/pla
 
 let fileStream = InputStream(url: fileURL)!
 
-let stream = ConcatenatedInputStream(of: [InputStream(data: formData.header), fileStream, InputStream(data: formData.footer)])
+let stream = ConcatenatedInputStream(of: [
+    InputStream(data: formData.header),
+    fileStream,
+    InputStream(data: formData.footer)
+    ])
 stream.open()
-let data = stream.readData()!
 
-print(String(data: data, encoding: .utf8)!)
+/*:
+ ## Read Data from an `InputStream`
+
+ A simple extension of `InputStream` reads all data from the stream.
+*/
+
+let fileWrappedByForm = try! stream.readData()
+print(String(data: fileWrappedByForm, encoding: .utf8)!)
+
+/*:
+ ## Multicast Delegates
+
+ A container for holding multiple weak references to delegates.
+*/
+
+protocol SomeDelegate: class { func foo() }
+class MyDelegate: SomeDelegate {
+    init(_ name: String) { self.name = name }
+    var name: String
+    func foo() { print("\(name) delegate called") }
+}
+
+let delegates = MulticastDelegates<SomeDelegate>()
+let permanentDelegate = MyDelegate("permanent")
+var transientDelegate: SomeDelegate = MyDelegate("transient")
+delegates.add(permanentDelegate)
+delegates.add(transientDelegate)
+delegates.add(permanentDelegate) // adding multiple times has no effect
+delegates.perform { $0.foo() }
+transientDelegate = MyDelegate("replacement")
+delegates.perform { $0.foo() } // the "transient delegate" was probably removed
+delegates.add(transientDelegate)
+delegates.perform { $0.foo() }
+
+class OtherClassDelegate: SomeDelegate {
+    func foo() { print("other implementation called") }
+}
+delegates.removeAll()
+transientDelegate = OtherClassDelegate()
+delegates.add(transientDelegate) // can contain mixed classes
+delegates.perform { $0.foo() }
+
+/*:
+ ## Dates and Times
+
+ Some helpers for dealing with dates and times.
+*/
+
+let dateString = Date().iso8601String()
+var date = Date(iso8601String: "1980-01-01T13:30:00+02:00")!
+date = date.midnightBefore()
+date += .days(246)
+date.noonOfTheDay().ageInYears()
+date = DateFormatter.iso8601Formatter.date(from: dateString)!
+
+/*:
+ ## Unicode Helpers
+
+ Some helpers for dealing with Unicode strings and characters.
+*/
+
+"Yes! 👍🏻".containsEmoji == true
+"Cats: 😻😻😻".containsOnlyEmoji == false
+"👍🏻👾".containsOnlyEmoji == true
+"No.".containsEmoji == false
+let stringWithForeignPrefix = "عربى foo bar baz"
+print(stringWithForeignPrefix)
+print(stringWithForeignPrefix.forcedLeftToRight)
+
+/*:
+ ## Geometry Helpers
+*/
+
+var point = CGPoint(x: 2, y: 2)
+
+//: New ways to create structs:
+let windowRect = CGSize(square: 100).rectangle(at: .zero)
+var uiRect1 = CGSize(square: 10).rectangle(at: point)
+
+//: Helpers for moving and aligning rectangles:
+uiRect1.move(centeredVerticallyInside: windowRect)
+uiRect1.move(insideLeftEdgeOf: windowRect, margin: 10)
+
+var uiRect2 = round(CGSize(width: uiRect1.width / 1.5, height: 20)).rectangle()
+uiRect2.move(leftOf: uiRect1, margin: 10)
+uiRect2.move(centeredVerticallyWith: uiRect1)
+uiRect2.midY == uiRect1.midY
+
+var uiRect3 = CGSize(square: 5).rectangle(centeredAt: uiRect2.center)
+uiRect3.center == uiRect2.center
+
+/*:
+ ## Localization Helpers
+*/
+
+isRightToLeft // app's layout direction
+print(stringWithForeignPrefix.forcedToNaturalDirection)
+
+//: Date formatting according to the app's current language.
+date.localizedString()
+date.localizedShortString()
+date.localizedShortTimeString()
+
+//: Date formatting according to system preferences.
+date.shortString()
+date.shortTimeString()
+date.mediumString()
+
+//: Number formatting according to app's current language.
+3.1415.localizedString(maxDecimals: 2)
+10000000.localizedString()
+
+//: Geometry helpers according to the layout direction.
+var point2 = point
+point.move(forward: 10)
+if isRightToLeft { point2.move(left: 10) } else { point2.move(right: 10) }
+point == point2
+
+uiRect1.move(insideLeadingEdgeOf: windowRect)
+uiRect2.move(after: uiRect1)

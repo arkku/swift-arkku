@@ -11,29 +11,6 @@
 
 import Foundation
 
-public extension InputStream {
-    public func readData() -> Data? {
-        if streamStatus == .notOpen {
-            open()
-        }
-
-        var data = Data()
-        var bufferSize = 4096
-        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: 4096)
-        defer { buffer.deallocate() }
-
-        repeat {
-            let bytesRead = read(buffer, maxLength: bufferSize)
-            guard bytesRead >= 0 else { return nil }
-            if bytesRead > 0 {
-                data.append(buffer, count: bytesRead)
-            }
-        } while streamStatus != .atEnd
-
-        return data
-    }
-}
-
 /// A wrapper for reading multiple `InputStream`'s sequentially. This allows
 /// mixing multiple sources, such as `Data` and files, in a single stream.
 public class ConcatenatedInputStream: InputStream, ExpressibleByArrayLiteral {
@@ -113,7 +90,13 @@ public class ConcatenatedInputStream: InputStream, ExpressibleByArrayLiteral {
     }
 
     override public func open() {
-        streams.last?.open()
+        guard let stream = streams.last else { return }
+        switch stream.streamStatus {
+        case .open, .opening:
+            return
+        default:
+            stream.open()
+        }
     }
 
     /// The other streams prefixing this one.
@@ -126,7 +109,7 @@ public class ConcatenatedInputStream: InputStream, ExpressibleByArrayLiteral {
         if stream.streamStatus != .closed {
             stream.close()
         }
-        streams.last!.open()
+        open()
         return true
     }
 }

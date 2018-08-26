@@ -149,7 +149,7 @@ extension LinkedList: CustomStringConvertible {
         for element in self {
             result = "\(result.isEmpty ? "(" : "\(result),") \(element)"
         }
-        return "\(result) )"
+        return "\(result.isEmpty ? "(" : result) )"
     }
 }
 
