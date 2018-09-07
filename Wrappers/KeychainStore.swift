@@ -37,8 +37,38 @@ public struct KeychainStore {
     /// The queue on which keychain operations are performed.
     let queue: DispatchQueue
 
+    /// The accessibility level of a keychain item.
+    public enum Accessible {
+        case always
+        case afterFirstUnlock
+        case whenUnlocked
+        case alwaysThisDeviceOnly
+        case whenPasscodeSetThisDeviceOnly
+        case afterFirstUnlockThisDeviceOnly
+        case whenUnlockedThisDeviceOnly
+
+        var rawValue: CFString {
+            switch self {
+            case .always:
+                return kSecAttrAccessibleAlways
+            case .afterFirstUnlock:
+                return kSecAttrAccessibleAfterFirstUnlock
+            case .whenUnlocked:
+                return kSecAttrAccessibleWhenUnlocked
+            case .whenPasscodeSetThisDeviceOnly:
+                return kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly
+            case .whenUnlockedThisDeviceOnly:
+                return kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            case .afterFirstUnlockThisDeviceOnly:
+                return kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            case .alwaysThisDeviceOnly:
+                return kSecAttrAccessibleAlwaysThisDeviceOnly
+            }
+        }
+    }
+
     /// Encode and store `value` in the keychain, under `key`.
-    public func store<T: Encodable>(_ value: T, forKey key: String, completion: @escaping (Error?) -> Void)  {
+        public func store<T: Encodable>(_ value: T, forKey key: String, accessible: Accessible, completion: @escaping (Error?) -> Void)  {
         queue.async {
             var encodedValue: Data
             do {
@@ -51,7 +81,7 @@ public struct KeychainStore {
             var queryAttributes = self.query(forKey: key)
             let storingAttributes: [String: Any] = [
                 .valueData: encodedValue,
-                .accessible: kSecAttrAccessibleAfterFirstUnlock
+                .accessible: accessible.rawValue
             ]
 
             let existingData = self.fetchData(forKey: key)

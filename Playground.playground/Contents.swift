@@ -427,7 +427,7 @@ uiRect2.move(after: uiRect1)
 
 let keychain = KeychainStore(service: "com.github.arkku.swift-arkku", queue: .main)
 
-keychain.store(fooBar, forKey: "FooBar") { error in
+keychain.store(fooBar, forKey: "FooBar", accessible: .alwaysThisDeviceOnly) { error in
     if let error = error {
         print("Keychain store failed: \(error)")
     } else {
@@ -435,7 +435,7 @@ keychain.store(fooBar, forKey: "FooBar") { error in
     }
 
     let updatedFooBar = FooBar(unwrapping: [ "foo":"updated".asValue, "bar":5.asValue ].asValue)!
-    keychain.store(updatedFooBar, forKey: "FooBar") { error in
+    keychain.store(updatedFooBar, forKey: "FooBar", accessible: .alwaysThisDeviceOnly) { error in
         if let error = error {
             print("Keychain update failed: \(error)")
         } else {
