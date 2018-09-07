@@ -415,3 +415,49 @@ point == point2
 
 uiRect1.move(insideLeadingEdgeOf: windowRect)
 uiRect2.move(after: uiRect1)
+
+/*:
+ ## Keychain Store
+
+ The `KeychainStore` is a simple wrapper for storing `Codable` values
+ in the keychain. The operations can be done asynchronously on another
+ queue, but in this example the main queue is used to keep the playground
+ flow simple.
+ */
+
+let keychain = KeychainStore(service: "com.github.arkku.swift-arkku", queue: .main)
+
+keychain.store(fooBar, forKey: "FooBar") { error in
+    if let error = error {
+        print("Keychain store failed: \(error)")
+    } else {
+        print("Keychain store success")
+    }
+
+    let updatedFooBar = FooBar(unwrapping: [ "foo":"updated".asValue, "bar":5.asValue ].asValue)!
+    keychain.store(updatedFooBar, forKey: "FooBar") { error in
+        if let error = error {
+            print("Keychain update failed: \(error)")
+        } else {
+            print("Keychain update success")
+        }
+
+        keychain.fetch(FooBar.self, forKey: "FooBar") { result in
+            if let retrievedFooBar = result {
+                print("Keychain fetch success: \(retrievedFooBar)")
+            } else {
+                print("Keychain fetch failed!")
+            }
+
+            keychain.removeValue(forKey: "FooBar") { error in
+                if let error = error {
+                    print("Keychain remove failed: \(error)")
+                } else {
+                    keychain.fetch(FooBar.self, forKey: "FooBar") { result in
+                        print("Keychain remove \(result == nil ? "success" : "failed(?)")")
+                    }
+                }
+            }
+        }
+    }
+}

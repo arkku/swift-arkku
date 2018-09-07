@@ -45,6 +45,8 @@
 		4EAD810A21331D4A00096D1F /* MulticastDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAD810821331D4A00096D1F /* MulticastDelegates.swift */; };
 		4EAD810C21331EFE00096D1F /* WeakReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAD810B21331EFE00096D1F /* WeakReference.swift */; };
 		4EAD810D21331EFE00096D1F /* WeakReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAD810B21331EFE00096D1F /* WeakReference.swift */; };
+		4EE2865521430D1E000FAA21 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE2865421430D1D000FAA21 /* KeychainStore.swift */; };
+		4EE2865621430D1E000FAA21 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE2865421430D1D000FAA21 /* KeychainStore.swift */; };
 		4EED37D221321E7C0067B6A2 /* InputStreamDataReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EED37D121321E7C0067B6A2 /* InputStreamDataReading.swift */; };
 		4EED37D321321E7C0067B6A2 /* InputStreamDataReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EED37D121321E7C0067B6A2 /* InputStreamDataReading.swift */; };
 		4EEF8D072133264400A50279 /* UnicodeHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEF8D062133264400A50279 /* UnicodeHelpers.swift */; };
@@ -80,6 +82,7 @@
 		4E735A972131B88F002CAD6F /* LinkedNodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedNodes.swift; sourceTree = "<group>"; };
 		4EAD810821331D4A00096D1F /* MulticastDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MulticastDelegates.swift; sourceTree = "<group>"; };
 		4EAD810B21331EFE00096D1F /* WeakReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakReference.swift; sourceTree = "<group>"; };
+		4EE2865421430D1D000FAA21 /* KeychainStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		4EED37D121321E7C0067B6A2 /* InputStreamDataReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputStreamDataReading.swift; sourceTree = "<group>"; };
 		4EEF8D062133264400A50279 /* UnicodeHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnicodeHelpers.swift; sourceTree = "<group>"; };
 		4EEF8D092133289100A50279 /* DateAndTimeHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateAndTimeHelpers.swift; sourceTree = "<group>"; };
@@ -164,6 +167,7 @@
 				4E735A912131884C002CAD6F /* ConcatenatedInputStream.swift */,
 				4EAD810821331D4A00096D1F /* MulticastDelegates.swift */,
 				4EAD810B21331EFE00096D1F /* WeakReference.swift */,
+				4EE2865421430D1D000FAA21 /* KeychainStore.swift */,
 				4E341465211DF72700C0E90D /* Combinations */,
 			);
 			path = Wrappers;
@@ -332,6 +336,7 @@
 				4E2A70A9211CF7DE001F21F5 /* MillisecondsDate.swift in Sources */,
 				4E2A70B5211D0780001F21F5 /* AValueKeyedByKnowable.swift in Sources */,
 				4EEF8D072133264400A50279 /* UnicodeHelpers.swift in Sources */,
+				4EE2865521430D1E000FAA21 /* KeychainStore.swift in Sources */,
 				4E5B8D5421238242006A519E /* LinkedList.swift in Sources */,
 				4EEF8D122133584300A50279 /* LocalizationHelpers.swift in Sources */,
 				4E735A9C2131BAAB002CAD6F /* NodeList.swift in Sources */,
@@ -362,6 +367,7 @@
 				4E341460211DEAAE00C0E90D /* DictionaryKeyedByKnowable.swift in Sources */,
 				4E2A70A6211CF7DE001F21F5 /* JSONHelpers.swift in Sources */,
 				4EEF8D082133264400A50279 /* UnicodeHelpers.swift in Sources */,
+				4EE2865621430D1E000FAA21 /* KeychainStore.swift in Sources */,
 				4E735A932131884C002CAD6F /* ConcatenatedInputStream.swift in Sources */,
 				4EEF8D132133584300A50279 /* LocalizationHelpers.swift in Sources */,
 				4E735A9D2131BAAC002CAD6F /* NodeList.swift in Sources */,
