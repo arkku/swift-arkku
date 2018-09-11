@@ -109,7 +109,12 @@ public struct KeychainStore {
             let queryAttributes = self.query(forKey: key)
             let status = SecItemDelete(queryAttributes as CFDictionary)
             DispatchQueue.main.async {
-                completion((status == errSecSuccess || status == noErr) ? nil : KeychainError.returnedFailure("SecItemDelete", status))
+                switch status {
+                case errSecSuccess, errSecItemNotFound, noErr:
+                    completion(nil)
+                default:
+                    completion(KeychainError.returnedFailure("SecItemDelete", status))
+                }
             }
         }
     }
