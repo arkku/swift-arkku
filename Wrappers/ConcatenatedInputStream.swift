@@ -13,7 +13,7 @@ import Foundation
 
 /// A wrapper for reading multiple `InputStream`'s sequentially. This allows
 /// mixing multiple sources, such as `Data` and files, in a single stream.
-public class ConcatenatedInputStream: InputStream, ExpressibleByArrayLiteral {
+public final class ConcatenatedInputStream: InputStream, ExpressibleByArrayLiteral {
     /// Prepare a wrapper stream concatenating `streams`.
     public init(of streams: [InputStream]) {
         self.streams = streams.reversed()

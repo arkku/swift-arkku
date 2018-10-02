@@ -348,7 +348,8 @@ var date = Date(iso8601String: "1980-01-01T13:30:00+02:00")!
 date = date.midnightBefore()
 date += .days(246)
 date.noonOfTheDay().ageInYears()
-date = DateFormatter.iso8601Formatter.date(from: dateString)!
+date = DateFormatter.rfc3339Formatter.date(from: dateString)!
+date = .utcNoonOf(year: 2001, month: 1, day: 1)!
 
 /*:
  ## Unicode Helpers
@@ -378,8 +379,10 @@ var uiRect1 = CGSize(square: 10).rectangle(at: point)
 uiRect1.move(centeredVerticallyInside: windowRect)
 uiRect1.move(insideLeftEdgeOf: windowRect, margin: 10)
 
-var uiRect2 = round(CGSize(width: uiRect1.width / 1.5, height: 20)).rectangle()
-uiRect2.move(leftOf: uiRect1, margin: 10)
+var uiRect2 = CGSize(width: uiRect1.width / 1.5, height: 20).rounded.rectangle()
+let margin: CGFloat = 10
+uiRect2.move(leftOf: uiRect1, margin: margin)
+uiRect2.maxX + margin == uiRect1.minX
 uiRect2.move(centeredVerticallyWith: uiRect1)
 uiRect2.midY == uiRect1.midY
 

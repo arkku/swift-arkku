@@ -12,9 +12,15 @@ public extension CGSize {
         self.init(width: dimension, height: dimension)
     }
 
-    /// A `CGRect` with this size and zero origin.
-    public var rectangleAtOrigin: CGRect {
-        return CGRect(origin: .zero, size: self)
+    /// A `CGRect` with this size and the given origin.
+    public func rectangle(at origin: CGPoint = .zero) -> CGRect {
+        return CGRect(origin: origin, size: self)
+    }
+
+    /// A `CGRect` with this size and the given center.
+    public func rectangle(centeredAt center: CGPoint) -> CGRect {
+        let origin = CGPoint(x: center.x - width / 2, y: center.y - height / 2)
+        return CGRect(origin: origin, size: self)
     }
 
     /// The size rounded up to the nearest integer.
@@ -81,7 +87,12 @@ public func round(_ size: CGSize) -> CGSize {
 public extension CGRect {
     /// Midpoint of the frame.
     public var center: CGPoint {
-        return CGPoint(x: midX, y: midY)
+        get {
+            return CGPoint(x: midX, y: midY)
+        }
+        set(newCenter) {
+            origin = CGPoint(x: newCenter.x - width / 2, y: newCenter.y - height / 2)
+        }
     }
 
     /// Move `origin.x` so that the frame is to the right of `sibling` with a

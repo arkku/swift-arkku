@@ -166,7 +166,7 @@ public extension BackwardLinked where Self: DataReference {
 // MARK: - Linked Nodes
 
 /// A node with associated data.
-public class DataNode<DataType: Any>: DataReference, CustomStringConvertible {
+open class DataNode<DataType: Any>: DataReference, CustomStringConvertible {
     /// Initialize a node holding `data`.
     public required init(_ data: DataType) {
         self.data = data
