@@ -13,39 +13,47 @@ public extension TimeZone {
     public static let utc = TimeZone(secondsFromGMT: 0)!
 }
 
-// MARK: - ISO Standard Dates
+// MARK: - Standard Dates
 
 public extension DateFormatter {
-
-    /// Return a new ISO-8601 date formatter.
-    public static func makeISO8601Formatter() -> DateFormatter {
+    /// Return a new RFC3339 date formatter.
+    public static func makeRFC3339Formatter() -> DateFormatter {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = .utc
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
-        formatter.isLenient = true
         return formatter
     }
 
-    /// A shared ISO8601 date formatter (e.g., "2016-09-03T10:20:30.123Z").
-    public static let iso8601Formatter: DateFormatter = makeISO8601Formatter()
+    /// A shared RFC3339 date formatter (e.g., "2016-09-03T10:20:30.123Z").
+    public static let rfc3339Formatter: DateFormatter = makeRFC3339Formatter()
+}
 
+public extension ISO8601DateFormatter {
+    /// Return a new RFC3339 date formatter.
+    public static func makeRFC3339Formatter() -> ISO8601DateFormatter {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }
+
+    /// A shared RFC3339 date formatter (e.g., "2016-09-03T10:20:30.123Z").
+    public static let rfc3339Formatter: ISO8601DateFormatter = makeRFC3339Formatter()
 }
 
 public extension Date {
-    /// Attempt to `dateString` in ISO-8601 format.
+    /// Attempt to parse `dateString` in ISO 8601 format.
     public init?(iso8601String dateString: String) {
-        let formatter = DateFormatter.iso8601Formatter
-        guard let date = formatter.date(from: dateString) ?? ISO8601DateFormatter().date(from: dateString) else {
+        guard let date = DateFormatter.rfc3339Formatter.date(from: dateString) ?? ISO8601DateFormatter().date(from: dateString) else {
             return nil
         }
         self = date
     }
 
-    /// Return this date as an ISO-8601 string.
+    /// Return this date as an ISO 8601 string.
     public func iso8601String() -> String {
-        return DateFormatter.iso8601Formatter.string(from: self)
+        return DateFormatter.rfc3339Formatter.string(from: self)
     }
 }
 
@@ -93,6 +101,18 @@ public extension Date {
     public func noonOfTheDay(usingCalendar calendar: Calendar = Calendar(identifier: .gregorian)) -> Date {
         return calendar.date(bySettingHour: 12, minute: 0, second: 0, of: self)!
     }
+
+    /// Create a date with the given year, month and day in the Gregorian
+    /// calendar at noon in the UTC timezone.
+    public static func utcNoonOf(year: Int, month: Int, day: Int) -> Date? {
+        let calendar = Calendar.gregorianUTC()
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        components.day = day
+        components.hour = 12
+        return calendar.date(from: components)
+    }
 }
 
 // MARK: - Time Interval Helpers
@@ -114,16 +134,19 @@ public extension TimeInterval {
     }
 
     /// An interval of a number of minutes.
+    @inline(__always)
     public static func minutes(_ minutes: Double) -> TimeInterval {
         return 60 * minutes as TimeInterval
     }
 
     /// An interval of a number of hours.
+    @inline(__always)
     public static func hours(_ hours: Double) -> TimeInterval {
         return 60 * 60 * hours as TimeInterval
     }
 
     /// An interval of a number of hours.
+    @inline(__always)
     public static func days(_ days: Double) -> TimeInterval {
         return 24 * 60 * 60 * days as TimeInterval
     }
