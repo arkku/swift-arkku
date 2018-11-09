@@ -68,7 +68,7 @@ public struct KeychainStore {
     }
 
     /// Encode and store `value` in the keychain, under `key`.
-        public func store<T: Encodable>(_ value: T, forKey key: String, accessible: Accessible, completion: @escaping (Error?) -> Void)  {
+    public func store<T: Encodable>(_ value: T, forKey key: String, accessible: Accessible, completion: @escaping (Error?) -> Void)  {
         queue.async {
             var encodedValue: Data
             do {

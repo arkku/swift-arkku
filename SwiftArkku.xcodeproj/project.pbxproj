@@ -57,6 +57,8 @@
 		4EEF8D102133511F00A50279 /* GeometryHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEF8D0E2133511F00A50279 /* GeometryHelpers.swift */; };
 		4EEF8D122133584300A50279 /* LocalizationHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEF8D112133584300A50279 /* LocalizationHelpers.swift */; };
 		4EEF8D132133584300A50279 /* LocalizationHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEF8D112133584300A50279 /* LocalizationHelpers.swift */; };
+		4EF7B8E22195F61000BFBD6E /* DataHexEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF7B8E12195F61000BFBD6E /* DataHexEncoding.swift */; };
+		4EF7B8E32195F61000BFBD6E /* DataHexEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF7B8E12195F61000BFBD6E /* DataHexEncoding.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +90,7 @@
 		4EEF8D092133289100A50279 /* DateAndTimeHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateAndTimeHelpers.swift; sourceTree = "<group>"; };
 		4EEF8D0E2133511F00A50279 /* GeometryHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryHelpers.swift; sourceTree = "<group>"; };
 		4EEF8D112133584300A50279 /* LocalizationHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationHelpers.swift; sourceTree = "<group>"; };
+		4EF7B8E12195F61000BFBD6E /* DataHexEncoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataHexEncoding.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,11 +200,12 @@
 		4EED37D021321E380067B6A2 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				4EED37D121321E7C0067B6A2 /* InputStreamDataReading.swift */,
-				4EEF8D062133264400A50279 /* UnicodeHelpers.swift */,
+				4EF7B8E12195F61000BFBD6E /* DataHexEncoding.swift */,
 				4EEF8D092133289100A50279 /* DateAndTimeHelpers.swift */,
 				4EEF8D0E2133511F00A50279 /* GeometryHelpers.swift */,
+				4EED37D121321E7C0067B6A2 /* InputStreamDataReading.swift */,
 				4EEF8D112133584300A50279 /* LocalizationHelpers.swift */,
+				4EEF8D062133264400A50279 /* UnicodeHelpers.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -329,6 +333,7 @@
 				4EEF8D0F2133511F00A50279 /* GeometryHelpers.swift in Sources */,
 				4EAD810921331D4A00096D1F /* MulticastDelegates.swift in Sources */,
 				4E735A9521318C41002CAD6F /* FormDataInputStream.swift in Sources */,
+				4EF7B8E22195F61000BFBD6E /* DataHexEncoding.swift in Sources */,
 				4E50D328211BC8C0007239EE /* AValue.swift in Sources */,
 				4EED37D221321E7C0067B6A2 /* InputStreamDataReading.swift in Sources */,
 				4E2A70A5211CF7DE001F21F5 /* JSONHelpers.swift in Sources */,
@@ -360,6 +365,7 @@
 				4EEF8D102133511F00A50279 /* GeometryHelpers.swift in Sources */,
 				4EAD810A21331D4A00096D1F /* MulticastDelegates.swift in Sources */,
 				4E5B8D522123733F006A519E /* ArrayExtensions.swift in Sources */,
+				4EF7B8E32195F61000BFBD6E /* DataHexEncoding.swift in Sources */,
 				4E34145D211DDC3E00C0E90D /* DictionaryKeyedByEnum.swift in Sources */,
 				4EED37D321321E7C0067B6A2 /* InputStreamDataReading.swift in Sources */,
 				4E341463211DF5C200C0E90D /* AValueDictionaryKeyedByEnum.swift in Sources */,

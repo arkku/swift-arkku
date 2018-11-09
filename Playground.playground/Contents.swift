@@ -305,6 +305,15 @@ let fileWrappedByForm = try! stream.readData()
 print(String(data: fileWrappedByForm, encoding: .utf8)!)
 
 /*:
+ ## Hexadecimal encoding of `Data`
+*/
+
+let hexString = "001020304050607080901a2b3c4e5f"
+let dataFromHex = Data(hexEncoded: hexString)!
+let hexFromData = dataFromHex.hexEncodedString()
+hexFromData == hexString
+
+/*:
  ## Multicast Delegates
 
  A container for holding multiple weak references to delegates.

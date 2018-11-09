@@ -7,6 +7,7 @@
 /// Weak reference wrapper (e.g., to store weak references in a collection
 /// that uses strong references).
 final class Weak<ReferredType>: Equatable, CustomStringConvertible where ReferredType: AnyObject {
+    /// The weak reference.
     public weak var reference: ReferredType?
 
     public init(_ reference: ReferredType) {
@@ -18,6 +19,10 @@ final class Weak<ReferredType>: Equatable, CustomStringConvertible where Referre
     }
 
     public var description: String {
-        return "weak(\(reference == nil ? "(nil)" : "\(reference!)"))"
+        if let reference = reference {
+            return "Weak(\(reference))"
+        } else {
+            return "Weak(nil)"
+        }
     }
 }
