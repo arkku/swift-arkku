@@ -8,7 +8,7 @@ import Foundation
 
 public extension Data {
     /// Encode the data into a hexadecimal string.
-    public func hexEncodedString() -> String {
+    func hexEncodedString() -> String {
         let digits = "0123456789abcdef".utf8.map { UInt8($0) }
         var hexBytes = [UInt8]()
         hexBytes.reserveCapacity(count * 2) // each byte is encoded into two
@@ -22,7 +22,7 @@ public extension Data {
     }
 
     /// Interpret `hexString` as hexadecimal.
-    public init?(hexEncoded hexString: String) {
+    init?(hexEncoded hexString: String) {
         let ignoredCharacters = CharacterSet.whitespacesAndNewlines
 
         var bytes = [UInt8]()

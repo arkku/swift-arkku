@@ -49,16 +49,16 @@ public typealias DoublyLinked = ForwardLinked & BackwardLinked & UnlinkableNode
 
 public extension ForwardLinked {
     /// Is this the last node in the list?
-    public var isLast: Bool { return next == nil }
+    var isLast: Bool { return next == nil }
 }
 
 public extension BackwardLinked {
     /// Is this the first node in the list?
-    public var isFirst: Bool { return previous == nil }
+    var isFirst: Bool { return previous == nil }
 }
 
 public extension BackwardLinked where Self: ForwardLinked {
-    public func unlink() {
+    func unlink() {
         let oldPrevious = previous
         let oldNext = next
         oldPrevious?.next = next
@@ -69,23 +69,23 @@ public extension BackwardLinked where Self: ForwardLinked {
 }
 
 public extension ForwardLinked where Self: UnlinkableNode {
-    public func unlinkNext() {
+    func unlinkNext() {
         next?.unlink()
     }
 }
 
 public extension ForwardLinked where Self: BackwardLinked {
-    public func linkNext(_ node: Self?) {
+    func linkNext(_ node: Self?) {
         node?.previous = self
         next = node
     }
 
-    public func linkAfter(_ previousNode: Self) {
+    func linkAfter(_ previousNode: Self) {
         linkNext(previousNode.next)
         previousNode.linkNext(self)
     }
 
-    public func linkBefore(_ nextNode: Self) {
+    func linkBefore(_ nextNode: Self) {
         let previousNode = nextNode.previous
         linkNext(nextNode)
         previousNode?.linkNext(self)
@@ -93,18 +93,18 @@ public extension ForwardLinked where Self: BackwardLinked {
 }
 
 public extension ForwardLinked {
-    public func linkNext(_ node: Self?) {
+    func linkNext(_ node: Self?) {
         next = node
     }
 
-    public func unlinkNext() {
+    func unlinkNext() {
         guard let oldNext = next else { return }
 
         next = oldNext.next
         oldNext.next = nil
     }
 
-    public func linkBefore(_ nextNode: Self) {
+    func linkBefore(_ nextNode: Self) {
         linkNext(nextNode)
     }
 }
@@ -130,9 +130,9 @@ public struct ForwardLinkIterator<Node: ForwardLinked & DataReference>: Iterator
 }
 
 public extension ForwardLinked where Self: DataReference {
-    public typealias ForwardIterator = ForwardLinkIterator<Self>
+    typealias ForwardIterator = ForwardLinkIterator<Self>
 
-    public func makeIterator() -> ForwardIterator {
+    func makeIterator() -> ForwardIterator {
         return ForwardIterator(self)
     }
 }
@@ -156,9 +156,9 @@ public struct BackwardLinkIterator<Node: BackwardLinked & DataReference>: Iterat
 }
 
 public extension BackwardLinked where Self: DataReference {
-    public typealias BackwardIterator = BackwardLinkIterator<Self>
+    typealias BackwardIterator = BackwardLinkIterator<Self>
 
-    public func makeBackwardIterator() -> BackwardIterator {
+    func makeBackwardIterator() -> BackwardIterator {
         return BackwardIterator(self)
     }
 }
@@ -196,20 +196,67 @@ public final class DoublyLinkedNode<DataType: Any>: DataNode<DataType>, DoublyLi
     public weak var previous: DoublyLinkedNode<DataType>?
 }
 
+public protocol DataOrSentinelNode: DataOrSentinel, DoublyLinked {
+    /// The data element, or `nil` if this is a sentinel node.
+    var element: DataType? { get set }
+
+    /// Prepare a sentinel node.
+    init()
+
+    /// Prepare a data node.
+    init(_ data: DataType)
+}
+
+public extension DataOrSentinelNode {
+    /// The data element of this node. Accessing this on a sentinel node
+    /// is a runtime error (see `isSentinel` and `element`).
+    var data: DataType {
+        get { return element! }
+        set { element = newValue }
+    }
+
+    /// Is this a sentinel node without data?
+    var isSentinel: Bool {
+        return element == nil
+    }
+
+    func makeIterator() -> SentinelForwardIterator<Self> {
+        return SentinelForwardIterator(position: self)
+    }
+
+    func makeBackwardIterator() -> SentinelReverseIterator<Self> {
+        return SentinelReverseIterator(position: self)
+    }
+}
+
+public struct SentinelForwardIterator<Node: DataOrSentinelNode>: IteratorProtocol, Sequence {
+    public mutating func next() -> Node.DataType? {
+        guard let data = position?.element else { return nil }
+        position = position?.next
+        return data
+    }
+
+    var position: Node?
+}
+
+public struct SentinelReverseIterator<Node: DataOrSentinelNode>: IteratorProtocol, Sequence {
+    public mutating func next() -> Node.DataType? {
+        guard let data = position?.element else { return nil }
+        position = position?.previous
+        return data
+    }
+
+    var position: Node?
+}
+
 /// A doubly-linked node that may also be a sentinel node, i.e., an empty node
 /// at the beginning and the end of the list to simplify implementation.
-public final class NodeOrSentinel<DataType: Any>: DataReference, DoublyLinked, Sequence, CustomStringConvertible {
+public final class NodeOrSentinel<DataType: Any>: DataOrSentinelNode, Sequence, CustomStringConvertible {
     public var next: NodeOrSentinel<DataType>?
 
     public weak var previous: NodeOrSentinel<DataType>?
 
-    /// The data element, or `nil` if this is a sentinel node.
     public var element: DataType?
-
-    /// Is this a sentinel node without data?
-    public var isSentinel: Bool {
-        return element == nil
-    }
 
     /// Prepare a sentinel node.
     public required init() {
@@ -221,44 +268,7 @@ public final class NodeOrSentinel<DataType: Any>: DataReference, DoublyLinked, S
         self.element = data
     }
 
-    /// The data element of this node. Accessing this on a sentinel node
-    /// is a runtime error (see `isSentinel` and `element`).
-    public var data: DataType {
-        get { return element! }
-        set { element = newValue }
-    }
-
     public var description: String {
         return isSentinel ? "||" : "\(data)"
-    }
-
-    public struct Iterator: IteratorProtocol, Sequence {
-        public mutating func next() -> DataType? {
-            guard let data = position.element else { return nil }
-            position = position.next!
-            return data
-        }
-
-        var position: NodeOrSentinel<DataType>
-    }
-
-    public typealias BackwardIterator = ReverseIterator
-
-    public struct ReverseIterator: IteratorProtocol, Sequence {
-        public mutating func next() -> DataType? {
-            guard let data = position.element else { return nil }
-            position = position.previous!
-            return data
-        }
-
-        var position: NodeOrSentinel<DataType>
-    }
-
-    public func makeIterator() -> Iterator {
-        return Iterator(position: self)
-    }
-
-    public func makeBackwardIterator() -> BackwardIterator {
-        return ReverseIterator(position: self)
     }
 }

@@ -13,7 +13,7 @@ public extension InputStream {
     ///
     /// Note: This may be arbitrarily slow, e.g., if the stream is reading
     /// over the network.
-    public func readData(bufferSize: Int = 4096) throws -> Data {
+    func readData(bufferSize: Int = 4096) throws -> Data {
         if streamStatus == .notOpen { open() }
 
         var data = Data()

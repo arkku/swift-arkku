@@ -25,25 +25,25 @@ public extension String {
     /// This is intended to be used on strings that may potentially begin with a
     /// foreign language string (e.g., if the string starts with an Arabic name
     /// while the app and the rest of the string is in English).
-    public var forcedToNaturalDirection: String {
+    var forcedToNaturalDirection: String {
         return String.naturalDirectionMark.appending(self)
     }
 
     /// The natural direction mark (left-to-right or right-to-left) for the
     /// app's language.
-    public static var naturalDirectionMark: String {
+    static var naturalDirectionMark: String {
         return isRightToLeft ? .rightToLeftMark : .leftToRightMark
     }
 }
 
 public extension NSTextAlignment {
     /// The reverse of natural alignment (i.e., right for left-to-right languages).
-    public static var unnatural: NSTextAlignment {
+    static var unnatural: NSTextAlignment {
         return isRightToLeft ? .left : .right
     }
 
     /// The natural alignment of the language (not necessarily of the text).
-    public static var forcedNatural: NSTextAlignment {
+    static var forcedNatural: NSTextAlignment {
         return isRightToLeft ? .right : left
     }
 }
@@ -52,112 +52,112 @@ public extension NSTextAlignment {
 
 public extension CGRect {
     /// The leading edge X coordinate.
-    public var leadingX: CGFloat {
+    var leadingX: CGFloat {
         return isRightToLeft ? maxX : minX
     }
 
     /// The trailing edge X coordinate.
-    public var trailingX: CGFloat {
+    var trailingX: CGFloat {
         return isRightToLeft ? minX : maxX
     }
 
     /// The leading edge X coordinate with `margin` offset (outset).
-    public func leadingX(offsetBy margin: CGFloat) -> CGFloat {
+    func leadingX(offsetBy margin: CGFloat) -> CGFloat {
         return isRightToLeft ? (maxX + margin) : (minX - margin)
     }
 
     /// The trailing edge X coordinate with `margin` offset (outset).
-    public func trailingX(offsetBy margin: CGFloat) -> CGFloat {
+    func trailingX(offsetBy margin: CGFloat) -> CGFloat {
         return isRightToLeft ? (minX - margin) : (maxX + margin)
     }
 
     /// The leading edge X coordinate with `margin` inset.
-    public func leadingX(insetBy margin: CGFloat) -> CGFloat {
+    func leadingX(insetBy margin: CGFloat) -> CGFloat {
         return isRightToLeft ? (maxX - margin) : (minX + margin)
     }
 
     /// The trailing edge X coordinate with `margin` inset.
-    public func trailingX(insetBy margin: CGFloat) -> CGFloat {
+    func trailingX(insetBy margin: CGFloat) -> CGFloat {
         return isRightToLeft ? (minX + margin) : (maxX - margin)
     }
 
     /// Move `origin.x` so that the frame's leading edge follows the trailing edge of
     /// `sibling` by a margin of `dx`.
-    public mutating func move(after sibling: CGRect, margin dx: CGFloat = 0) {
+    mutating func move(after sibling: CGRect, margin dx: CGFloat = 0) {
         origin.x = isRightToLeft ? (sibling.minX - width - dx) : (sibling.maxX + dx)
     }
 
     /// Move `origin.x` so that the frame's trailing edge precedes the leading edge of
     /// `sibling` by a margin of `dx`.
-    public mutating func move(before sibling: CGRect, margin dx: CGFloat = 0) {
+    mutating func move(before sibling: CGRect, margin dx: CGFloat = 0) {
         origin.x = isRightToLeft ? (sibling.maxX + dx) : (sibling.minX - width - dx)
     }
 
     /// Move `origin.x` so that the frame's trailing edge precedes the trailing edge
     /// of `parent` _in its coordinates_ by a margin of `dx`.
-    public mutating func move(insideTrailingEdgeOf parent: CGRect, margin dx: CGFloat = 0) {
+    mutating func move(insideTrailingEdgeOf parent: CGRect, margin dx: CGFloat = 0) {
         origin.x = isRightToLeft ? dx : (parent.width - width - dx)
     }
 
     /// Move `origin.x` so that the frame's leading edge follows the leading edge
     /// of `parent` _in its coordinates_ by a margin of `dx`.
-    public mutating func move(insideLeadingEdgeOf parent: CGRect, margin dx: CGFloat = 0) {
+    mutating func move(insideLeadingEdgeOf parent: CGRect, margin dx: CGFloat = 0) {
         origin.x = isRightToLeft ? (parent.width - width - dx) : dx
     }
 
     /// Move `origin.x` so that the frame's leading edge is aligned with that of
     /// `sibling`, adjusted forward by `dx`.
-    public mutating func move(alignedWithLeadingEdgeOf sibling: CGRect, margin dx: CGFloat = 0) {
+    mutating func move(alignedWithLeadingEdgeOf sibling: CGRect, margin dx: CGFloat = 0) {
         origin.x = isRightToLeft ? (sibling.maxX - width - dx) : (sibling.minX + dx)
     }
 
     /// Move `origin.x` so that the frame's trailing edge is aligned with that of
     /// `sibling`, adjusted backward by `dx`.
-    public mutating func move(alignedWithTrailingEdgeOf sibling: CGRect, margin dx: CGFloat = 0) {
+    mutating func move(alignedWithTrailingEdgeOf sibling: CGRect, margin dx: CGFloat = 0) {
         origin.x = isRightToLeft ? (sibling.minX + dx) : (sibling.maxX - width - dx)
     }
 
     /// Move `origin.x` towards the trailing edge by `dx`.
-    public mutating func move(forward dx: CGFloat) {
+    mutating func move(forward dx: CGFloat) {
         origin.x += dx * (isRightToLeft ? -1 : 1)
     }
 
     /// Move `origin.x` towards the leading edge by `dx`.
-    public mutating func move(backward dx: CGFloat) {
+    mutating func move(backward dx: CGFloat) {
         origin.x += dx * (isRightToLeft ? 1 : -1)
     }
 }
 
 public extension CGPoint {
     /// The point moved towards the trailing edge by `dx`.
-    public func moved(forward dx: CGFloat) -> CGPoint {
+    func moved(forward dx: CGFloat) -> CGPoint {
         return isRightToLeft ? CGPoint(x: x - dx, y: y) : CGPoint(x: x + dx, y: y)
     }
 
     /// Move the point towards the trailing edge by `dx`.
-    public mutating func move(forward dx: CGFloat) {
+    mutating func move(forward dx: CGFloat) {
         x += dx * (isRightToLeft ? -1 : 1)
     }
 
     /// The point moved towards the leading edge by `dx`.
-    public func moved(backward dx: CGFloat) -> CGPoint {
+    func moved(backward dx: CGFloat) -> CGPoint {
         return isRightToLeft ? CGPoint(x: x + dx, y: y) : CGPoint(x: x - dx, y: y)
     }
 
     /// Move the point towards the leading edge by `dx`.
-    public mutating func move(backward dx: CGFloat) {
+    mutating func move(backward dx: CGFloat) {
         x += dx * (isRightToLeft ? 1 : -1)
     }
 }
 
 public extension CGRectEdge {
     /// The leading X edge according to UI direction.
-    public static var leadingXEdge: CGRectEdge {
+    static var leadingXEdge: CGRectEdge {
         return isRightToLeft ? .maxXEdge : minXEdge
     }
 
     /// The trailing X edge according to UI direction.
-    public static var trailingXEdge: CGRectEdge {
+    static var trailingXEdge: CGRectEdge {
         return isRightToLeft ? .minXEdge : maxXEdge
     }
 }
@@ -168,7 +168,7 @@ public extension Locale {
     /// The locale for the app's current language. This matches the language of
     /// translated strings, whereas `Locale.current` matches the user's
     /// preferences independent of language.
-    public static let ofAppLanguage: Locale = {
+    static let ofAppLanguage: Locale = {
         guard let languageID = Bundle.main.preferredLocalizations.first else {
             return Locale.current
         }
@@ -182,7 +182,7 @@ public extension Locale {
 public extension NumberFormatter {
     /// Make a new decimal `NumberFormatter` for the app's current language.
     /// The formatter will have `numberStyle` `.decimal`.
-    public static func makeForAppLanguage() -> NumberFormatter {
+    static func makeForAppLanguage() -> NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.allowsFloats = true
@@ -191,26 +191,26 @@ public extension NumberFormatter {
     }
 
     /// A shared default formatter as returned by `makeNumberFormatterForAppLanguage()`.
-    public static let appLanguageDefault = NumberFormatter.makeForAppLanguage()
+    static let appLanguageDefault = NumberFormatter.makeForAppLanguage()
 }
 
 public extension SignedInteger {
     /// A localized decimal representation of the integer.
-    public func localizedString() -> String {
+    func localizedString() -> String {
         return NumberFormatter.appLanguageDefault.string(from: NSNumber(value: Int64(self))) ?? description
     }
 }
 
 public extension UnsignedInteger {
     /// A localized decimal representation of the integer.
-    public func localizedString() -> String {
+    func localizedString() -> String {
         return NumberFormatter.appLanguageDefault.string(from: NSNumber(value: UInt64(self))) ?? description
     }
 }
 
 public extension NSNumber {
     /// A localized representation of the number with a maximum of `precision` decimal places.
-    public func localizedString(maxDecimals precision: Int, numberStyle: NumberFormatter.Style = .decimal) -> String {
+    func localizedString(maxDecimals precision: Int, numberStyle: NumberFormatter.Style = .decimal) -> String {
         let formatter = NumberFormatter.makeForAppLanguage()
         formatter.numberStyle = numberStyle
         formatter.maximumFractionDigits = precision
@@ -220,14 +220,14 @@ public extension NSNumber {
 
 public extension Float {
     /// A localized representation of the number with a maximum of `precision` decimal places.
-    public func localizedString(maxDecimals precision: Int, numberStyle: NumberFormatter.Style = .decimal) -> String {
+    func localizedString(maxDecimals precision: Int, numberStyle: NumberFormatter.Style = .decimal) -> String {
         return NSNumber(value: self).localizedString(maxDecimals: precision, numberStyle: numberStyle)
     }
 }
 
 public extension Double {
     /// A localized representation of the number with a maximum of `precision` decimal places.
-    public func localizedString(maxDecimals precision: Int, numberStyle: NumberFormatter.Style = .decimal) -> String {
+    func localizedString(maxDecimals precision: Int, numberStyle: NumberFormatter.Style = .decimal) -> String {
         return NSNumber(value: self).localizedString(maxDecimals: precision, numberStyle: numberStyle)
     }
 }
@@ -236,14 +236,14 @@ public extension Double {
 
 public extension DateFormatter {
     /// Make a new `DateFormatter` for the app's current language.
-    public static func makeForAppLanguage() -> DateFormatter {
+    static func makeForAppLanguage() -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = .ofAppLanguage
         return formatter
     }
 
     /// A shared formatter for short time in the app's current language.
-    public static let appLanguageShortTime: DateFormatter = {
+    static let appLanguageShortTime: DateFormatter = {
         let formatter = DateFormatter.makeForAppLanguage()
         formatter.timeStyle = .short
         formatter.dateStyle = .none
@@ -251,7 +251,7 @@ public extension DateFormatter {
     }()
 
     /// A shared formatter for short date in the app's current language.
-    public static let appLanguageShortDate: DateFormatter = {
+    static let appLanguageShortDate: DateFormatter = {
         let formatter = DateFormatter.makeForAppLanguage()
         formatter.timeStyle = .none
         formatter.dateStyle = .short
@@ -259,7 +259,7 @@ public extension DateFormatter {
     }()
 
     /// A shared formatter for medium date in the app's current language.
-    public static let appLanguageMediumDate: DateFormatter = {
+    static let appLanguageMediumDate: DateFormatter = {
         let formatter = DateFormatter.makeForAppLanguage()
         formatter.timeStyle = .none
         formatter.dateStyle = .medium
@@ -267,7 +267,7 @@ public extension DateFormatter {
     }()
 
     /// A shared formatter for short time in the app's current language.
-    public static let shortTime: DateFormatter = {
+    static let shortTime: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = .current
         formatter.timeStyle = .short
@@ -276,7 +276,7 @@ public extension DateFormatter {
     }()
 
     /// A shared formatter for short date in the app's current language.
-    public static let shortDate: DateFormatter = {
+    static let shortDate: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = .current
         formatter.timeStyle = .none
@@ -285,7 +285,7 @@ public extension DateFormatter {
     }()
 
     /// A shared formatter for medium date in the app's current language.
-    public static let mediumDate: DateFormatter = {
+    static let mediumDate: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = .current
         formatter.timeStyle = .none
@@ -297,37 +297,37 @@ public extension DateFormatter {
 public extension Date {
     /// A short localized representation of the time (typically hours and minutes) in
     /// the app's current language.
-    public func localizedShortTimeString() -> String {
+    func localizedShortTimeString() -> String {
         return DateFormatter.appLanguageShortTime.string(from: self)
     }
 
     /// A short localized representation of the date (without time) in the app's
     /// current language.
-    public func localizedShortString() -> String {
+    func localizedShortString() -> String {
         return DateFormatter.appLanguageShortDate.string(from: self)
     }
 
     /// A localized representation of the date (without time) in the app's current
     /// language.
-    public func localizedString() -> String {
+    func localizedString() -> String {
         return DateFormatter.appLanguageMediumDate.string(from: self)
     }
 
     /// A short localized representation of the time (typically hours and minutes) in
     /// the app's current language.
-    public func shortTimeString() -> String {
+    func shortTimeString() -> String {
         return DateFormatter.shortTime.string(from: self)
     }
 
     /// A short localized representation of the date (without time) in the app's
     /// current language.
-    public func shortString() -> String {
+    func shortString() -> String {
         return DateFormatter.shortDate.string(from: self)
     }
 
     /// A localized representation of the date (without time) in the app's current
     /// language.
-    public func mediumString() -> String {
+    func mediumString() -> String {
         return DateFormatter.mediumDate.string(from: self)
     }
 }

@@ -123,6 +123,13 @@ public protocol DataReference: class {
     var data: DataType { get set }
 }
 
+/// An object with associated data, or a sentinel.
+public protocol DataOrSentinel: DataReference {
+
+    /// Is this a sentinel? Accessing `data` is not permitted on sentinels.
+    var isSentinel: Bool { get }
+}
+
 // MARK: - Default Implementations
 
 // Default implementation of `Queue` as a `AppendableList`.

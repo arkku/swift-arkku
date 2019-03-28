@@ -171,15 +171,15 @@ public protocol RangeReplaceableNodeList: BidirectionalNodeList, RangeReplaceabl
 /// A linked list of nodes where two sentinel nodes are used to simplify the
 /// implementation; these permanent nodes at the ends of the list do not
 /// carry data and must never be removed.
-public protocol SentinelNodeList: LinkedNodeList where Node: NodeOrSentinel<Element> {
+public protocol SentinelNodeList: LinkedNodeList where Node: DataOrSentinelNode {
     var headSentinel: Node { get }
     var tailSentinel: Node { get }
 }
 
 // MARK: - List Protocol Extensions
 
-public extension SentinelNodeList where Self: DepthCounting, Self.Node == NodeOrSentinel<Element> {
-    public var head: Node? {
+public extension SentinelNodeList where Self: DepthCounting {
+    var head: Node? {
         get {
             if let headNode = headSentinel.next, !headNode.isSentinel {
                 return headNode
@@ -188,7 +188,10 @@ public extension SentinelNodeList where Self: DepthCounting, Self.Node == NodeOr
         }
         set {
             if let newHead = newValue {
-                newHead.linkNext(headSentinel.next!)
+                let oldHead = headSentinel.next
+                if !(oldHead === newHead) {
+                    newHead.linkNext(oldHead)
+                }
                 headSentinel.linkNext(newHead)
             } else {
                 removeAll()
@@ -196,7 +199,7 @@ public extension SentinelNodeList where Self: DepthCounting, Self.Node == NodeOr
         }
     }
 
-    public weak var tail: Node? {
+    weak var tail: Node? {
         get {
             if let tailNode = tailSentinel.previous, !tailNode.isSentinel {
                 return tailNode
@@ -205,7 +208,10 @@ public extension SentinelNodeList where Self: DepthCounting, Self.Node == NodeOr
         }
         set {
             if let newTail = newValue {
-                tailSentinel.previous!.linkNext(newTail)
+                let oldTail = tailSentinel.previous!
+                if !(oldTail === newTail) {
+                    oldTail.linkNext(newTail)
+                }
                 newTail.linkNext(tailSentinel)
             } else {
                 removeAll()
@@ -213,64 +219,65 @@ public extension SentinelNodeList where Self: DepthCounting, Self.Node == NodeOr
         }
     }
 
-    public typealias Iterator = Node.Iterator
-    public typealias ReverseIterator = Node.ReverseIterator
+    typealias Iterator = SentinelForwardIterator<Node>
+    typealias ReverseIterator = SentinelReverseIterator<Node>
 
-    public func makeIterator() -> Iterator {
-        return Iterator(position: headSentinel.next!)
+    func makeIterator() -> Iterator {
+        return Iterator(position: headSentinel.next)
     }
 
-    public func makeReverseIterator() -> ReverseIterator {
-        return ReverseIterator(position: tailSentinel.previous!)
+    func makeReverseIterator() -> ReverseIterator {
+        return ReverseIterator(position: tailSentinel.previous)
     }
 
-    public mutating func insertAsHead(_ node: Node) {
+    mutating func insertAsHead(_ node: Node) {
         assert(!node.isSentinel)
         node.linkAfter(headSentinel)
         headDepth -= 1
     }
 
-    public mutating func append(node: Node) {
+    mutating func append(node: Node) {
         assert(!node.isSentinel)
         node.linkBefore(tailSentinel)
         tailDepth += 1
     }
 
-    public mutating func insert(node: Node, after previousNode: Node) {
+    mutating func insert(node: Node, after previousNode: Node) {
         assert(!(previousNode === tailSentinel))
         node.linkAfter(previousNode)
         tailDepth += 1
     }
 
-    public mutating func insert(node: Node, before nextNode: Node) {
+    mutating func insert(node: Node, before nextNode: Node) {
         assert(!(nextNode === headSentinel))
         node.linkBefore(nextNode)
         headDepth -= 1
     }
 
-    public mutating func remove(node: Node) {
+    mutating func remove(node: Node) {
         assert(!node.isSentinel)
         node.unlink()
         tailDepth -= 1
     }
 
     @discardableResult
-    public mutating func popFirstNode() -> Node? {
+    mutating func popFirstNode() -> Node? {
         guard let firstNode = headSentinel.next, !firstNode.isSentinel else { return nil }
         firstNode.unlink()
         headDepth += 1
         return firstNode
     }
 
+    // FIXME: Currently the compiler is choosing another implementation instead of this
     @discardableResult
-    public mutating func popLastNode() -> Node? {
+    mutating func popLastNode() -> Node? {
         guard let lastNode = tailSentinel.previous, !lastNode.isSentinel else { return nil }
         lastNode.unlink()
         tailDepth -= 1
         return lastNode
     }
 
-    public mutating func removeAll() {
+    mutating func removeAll() {
         headSentinel.linkNext(tailSentinel)
         headDepth = 0
         tailDepth = 0
@@ -279,9 +286,9 @@ public extension SentinelNodeList where Self: DepthCounting, Self.Node == NodeOr
 
 public extension LinkedNodeList {
     /// Is the list empty?
-    public var isEmpty: Bool { return head == nil }
+    var isEmpty: Bool { return head == nil }
 
-    public mutating func insertAsHead(_ node: Node) {
+    mutating func insertAsHead(_ node: Node) {
         node.linkNext(head)
         head = node
         if tail == nil {
@@ -293,7 +300,7 @@ public extension LinkedNodeList {
         }
     }
 
-    public mutating func append(node: Node) {
+    mutating func append(node: Node) {
         if let oldTail = tail {
             oldTail.linkNext(node)
         } else {
@@ -307,7 +314,7 @@ public extension LinkedNodeList {
     }
 
     /// Insert `node` after `previousNode`, which must be a node in the list.
-    public mutating func insert(node: Node, after previousNode: Node) {
+    mutating func insert(node: Node, after previousNode: Node) {
         guard !(previousNode === tail) else {
             append(node: node)
             return
@@ -321,7 +328,7 @@ public extension LinkedNodeList {
         }
     }
 
-    public mutating func removeAll() {
+    mutating func removeAll() {
         tail = nil
         head = nil
 
@@ -332,7 +339,7 @@ public extension LinkedNodeList {
     }
 
     @discardableResult
-    public mutating func popFirstNode() -> Node? {
+    mutating func popFirstNode() -> Node? {
         guard let oldHead = head else { return nil }
 
         if let newHead = oldHead.next {
@@ -355,14 +362,14 @@ public extension LinkedNodeList {
     }
 
     @discardableResult
-    public mutating func removeFirstNode() -> Node {
+    mutating func removeFirstNode() -> Node {
         return popFirstNode()!
     }
 }
 
 public extension LinkedNodeList where Node: BackwardLinked {
     /// Inserts `node` before `nextNode`, which must be a node in the list.
-    public mutating func insert(node: Node, before nextNode: Node) {
+    mutating func insert(node: Node, before nextNode: Node) {
         if let previousNode = nextNode.previous {
             insert(node: node, after: previousNode)
         } else {
@@ -373,14 +380,14 @@ public extension LinkedNodeList where Node: BackwardLinked {
 
 public extension LinkedNodeList where Node: BackwardLinked & DataReference {
     /// Insert `element` before `nextNode`, which must be a node in the list.
-    public mutating func insert(_ element: Node.DataType, beforeNode nextNode: Node) {
+    mutating func insert(_ element: Node.DataType, beforeNode nextNode: Node) {
         self.insert(node: Node(element), before: nextNode)
     }
 }
 
 public extension LinkedNodeList where Node: DataReference {
     /// Insert `element` after `previousNode`, which must be a node in the list.
-    public mutating func insert(_ element: Node.DataType, afterNode previousNode: Node) {
+    mutating func insert(_ element: Node.DataType, afterNode previousNode: Node) {
         self.insert(node: Node(element), after: previousNode)
     }
 }
@@ -389,11 +396,11 @@ public extension LinkedNodeList where Node: UnlinkableNode & BackwardLinked {
     /// Removes the last node in the list and returns it.
     /// If the list is empty, `nil` is returned. See also `removeLastNode()`.
     @discardableResult
-    public mutating func popLastNode() -> Node? {
-        guard let lastNode = tail else { return nil }
+    mutating func popLastNode() -> Node? {
+        guard let oldTail = tail else { return nil }
 
-        if let newTail = lastNode.previous {
-            lastNode.unlink()
+        if let newTail = oldTail.previous {
+            oldTail.unlink()
             tail = newTail
         } else {
             head = nil
@@ -404,20 +411,22 @@ public extension LinkedNodeList where Node: UnlinkableNode & BackwardLinked {
             depthCounting.tailDepth -= 1
         }
 
-        return lastNode
+        return oldTail
     }
+}
 
+public extension LinkedNodeList where Node: UnlinkableNode & BackwardLinked {
     /// Removes the last node in the list and returns it.
     /// The list must not be empty when called. See also `popLastNode()`.
     @discardableResult
-    public mutating func removeLastNode() -> Node {
+    mutating func removeLastNode() -> Node {
         return popLastNode()!
     }
 
     /// Removes `node` from the list. The argument must be a node
     /// in this list. Note: existing indices may become invalid
     /// if a node in the middle of the list is removed.
-    public mutating func remove(node: Node) {
+    mutating func remove(node: Node) {
         if node === head {
             popFirstNode()
             return
@@ -438,25 +447,25 @@ public extension LinkedNodeList where Node: UnlinkableNode & BackwardLinked {
 
 public extension LinkedNodeList where Node: DataReference {
     /// First element in the list, or `nil` if empty.
-    public var first: Node.DataType? {
+    var first: Node.DataType? {
         return head?.data
     }
 
     /// Last element in the list, or `nil` if empty.
-    public var last: Node.DataType? {
+    var last: Node.DataType? {
         return tail?.data
     }
 }
 
 public extension LinkedNodeList where Node: DataReference, Self: ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: Element...) {
+    init(arrayLiteral elements: Element...) {
         self.init(elements)
     }
 }
 
 public extension LinkedNodeList where Node: DataReference {
     /// Make a list with the contents of `array`.
-    public init(_ array: [Element]) {
+    init(_ array: [Element]) {
         self.init()
         for element in array {
             append(element)
@@ -464,38 +473,38 @@ public extension LinkedNodeList where Node: DataReference {
     }
 
     /// Insert `element` to the beginning of the list.
-    public mutating func insertAsFirst(_ element: Node.DataType) {
+    mutating func insertAsFirst(_ element: Node.DataType) {
         insertAsHead(Node(element))
     }
 
     /// Append `element` to the end of the list.
-    public mutating func append(_ element: Node.DataType) {
+    mutating func append(_ element: Node.DataType) {
         append(node: Node(element))
     }
 
     /// Removes the first element in the list and returns it.
     /// If the list is empty, `nil` is returned. See also `removeFirst()`.
     @discardableResult
-    public mutating func popFirst() -> Node.DataType? {
+    mutating func popFirst() -> Node.DataType? {
         return popFirstNode()?.data
     }
 
     /// Removes the first element in the list and returns it.
     /// The list must not be empty when called. See also `popFirst()`.
     @discardableResult
-    public mutating func removeFirst() -> Node.DataType {
+    mutating func removeFirst() -> Node.DataType {
         return removeFirstNode().data
     }
 }
 
 public extension BidirectionalNodeList where Self.Node: DataReference & BackwardLinked & UnlinkableNode {
     @discardableResult
-    public mutating func popLast() -> Node.DataType? {
+    mutating func popLast() -> Node.DataType? {
         return popLastNode()?.data
     }
 
     @discardableResult
-    public mutating func removeLast() -> Node.DataType {
+    mutating func removeLast() -> Node.DataType {
         return removeLastNode().data
     }
 }
@@ -503,13 +512,13 @@ public extension BidirectionalNodeList where Self.Node: DataReference & Backward
 // MARK: - Sequence Conformance
 
 public extension Sequence where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.DataType == Iterator.Element {
-    public func makeIterator() -> ForwardLinkIterator<Node> {
+    func makeIterator() -> ForwardLinkIterator<Node> {
         return ForwardLinkIterator<Node>(head)
     }
 }
 
 public extension Sequence where Self: DepthCounting {
-    public var underestimatedCount: Int {
+    var underestimatedCount: Int {
         return tailDepth - headDepth
     }
 }
@@ -536,19 +545,19 @@ public struct NodeIndex<Node: AnyObject>: Comparable {
 }
 
 public extension Collection where Self: LinkedNodeList, Self: DepthCounting {
-    public typealias DepthIndex = NodeIndex<Node>
+    typealias DepthIndex = NodeIndex<Node>
 
-    public var startIndex: DepthIndex { return DepthIndex(depth: headDepth, node: head) }
+    var startIndex: DepthIndex { return DepthIndex(depth: headDepth, node: head) }
 
-    public var endIndex: DepthIndex { return DepthIndex(depth: tailDepth, node: nil) }
+    var endIndex: DepthIndex { return DepthIndex(depth: tailDepth, node: nil) }
 
-    public func index(after i: DepthIndex) -> DepthIndex {
+    func index(after i: DepthIndex) -> DepthIndex {
         return DepthIndex(depth: i.depth + 1, node: i.node?.next)
     }
 }
 
 public extension Collection where Self: LinkedNodeList, Self: DepthCounting, Self.Node: DataReference, Self.Node.DataType == Iterator.Element {
-    public subscript(index: DepthIndex) -> Node.DataType {
+    subscript(index: DepthIndex) -> Node.DataType {
         get {
             return index.node!.data
         }
@@ -557,15 +566,15 @@ public extension Collection where Self: LinkedNodeList, Self: DepthCounting, Sel
         }
     }
 
-    public var count: Int {
+    var count: Int {
         return tailDepth - headDepth
     }
 }
 
 public extension BidirectionalCollection where Self: LinkedNodeList, Self: DepthCounting, Self.Node: BackwardLinked {
-    public typealias BidirectionalDepthIndex = NodeIndex<Node>
+    typealias BidirectionalDepthIndex = NodeIndex<Node>
 
-    public func index(before i: BidirectionalDepthIndex) -> BidirectionalDepthIndex {
+    func index(before i: BidirectionalDepthIndex) -> BidirectionalDepthIndex {
         guard let nextNode = i.node else {
             return BidirectionalDepthIndex(depth: tailDepth - 1, node: tail)
         }
@@ -574,18 +583,18 @@ public extension BidirectionalCollection where Self: LinkedNodeList, Self: Depth
 }
 
 public extension RangeReplaceableCollection where Self: LinkedNodeList, Self: DepthCounting, Self.Node: BackwardLinked & UnlinkableNode & DataReference {
-    public init<S>(_ elements: S) where S: Sequence, S.Element == Node.DataType {
+    init<S>(_ elements: S) where S: Sequence, S.Element == Node.DataType {
         self.init()
         append(contentsOf: elements)
     }
 
-    public mutating func append<S>(contentsOf newElements: S) where S: Sequence, S.Element == Node.DataType {
+    mutating func append<S>(contentsOf newElements: S) where S: Sequence, S.Element == Node.DataType {
         for element in newElements {
             append(element)
         }
     }
 
-    public mutating func replaceSubrange<C>(_ subrange: Range<NodeIndex<Node>>, with newElements: C) where C: Collection, C.Element == Node.DataType {
+    mutating func replaceSubrange<C>(_ subrange: Range<NodeIndex<Node>>, with newElements: C) where C: Collection, C.Element == Node.DataType {
         var position = subrange.lowerBound.node ?? head
         let lastToRemove = subrange.upperBound.node?.previous ?? tail
         if position === head && lastToRemove === tail {
@@ -614,9 +623,9 @@ public extension RangeReplaceableCollection where Self: LinkedNodeList, Self: De
 }
 
 public extension RangeReplaceableNodeList where Self: SentinelNodeList, Self: DepthCounting, Self.Node == NodeOrSentinel<Element> {
-    public var isEmpty: Bool { return headSentinel.next === tailSentinel }
+    var isEmpty: Bool { return headSentinel.next === tailSentinel }
 
-    public mutating func replaceSubrange<C>(_ subrange: Range<NodeIndex<Node>>, with newElements: C) where C: Collection, C.Element == Self.Element {
+    mutating func replaceSubrange<C>(_ subrange: Range<NodeIndex<Node>>, with newElements: C) where C: Collection, C.Element == Self.Element {
         var insertAfter = subrange.lowerBound.node?.previous ?? headSentinel
         var position = insertAfter.next
         let endBefore = subrange.upperBound.node ?? tailSentinel
@@ -635,36 +644,36 @@ public extension RangeReplaceableNodeList where Self: SentinelNodeList, Self: De
 // These are just to avoid ambiguity with multiple default implementations:
 
 public extension Collection where Self: LinkedNodeList {
-    public var isEmpty: Bool { return head == nil }
+    var isEmpty: Bool { return head == nil }
 }
 
 public extension Collection where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.DataType == Self.Iterator.Element {
-    public var first: Node.DataType? { return head?.data }
+    var first: Node.DataType? { return head?.data }
 }
 
 public extension BidirectionalCollection where Self: LinkedNodeList, Self.Node: DataReference, Self.Node.DataType == Self.Iterator.Element {
-    public var last: Node.DataType? { return tail?.data }
+    var last: Node.DataType? { return tail?.data }
 }
 
 public extension RangeReplaceableCollection where Self: LinkedNodeList, Self.Node: DataReference {
-    public mutating func append(_ element: Node.DataType) {
+    mutating func append(_ element: Node.DataType) {
         append(node: Node(element))
     }
 
     @discardableResult
-    public mutating func removeFirst() -> Node.DataType {
+    mutating func removeFirst() -> Node.DataType {
         return removeFirstNode().data
     }
 }
 
 public extension RangeReplaceableNodeList where Self.Node: DataReference & BackwardLinked & UnlinkableNode {
     @discardableResult
-    public mutating func popLast() -> Node.DataType? {
+    mutating func popLast() -> Node.DataType? {
         return popLastNode()?.data
     }
 
     @discardableResult
-    public mutating func removeLast() -> Node.DataType {
+    mutating func removeLast() -> Node.DataType {
         return removeLastNode().data
     }
 }

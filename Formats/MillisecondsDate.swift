@@ -15,22 +15,22 @@ import Foundation
 
 public extension Date {
     /// A date with `milliseconds` since 1970.
-    public init(millisecondsSince1970 milliseconds: Double) {
+    init(millisecondsSince1970 milliseconds: Double) {
         self.init(timeIntervalSince1970: (milliseconds / 1000) as TimeInterval)
     }
 
     /// A date with `milliseconds` since 1970.
-    public init(millisecondsSince1970 milliseconds: Int64) {
+    init(millisecondsSince1970 milliseconds: Int64) {
         self.init(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
     }
 
     /// Milliseconds since 1970.
-    public var millisecondsSince1970: Double {
+    var millisecondsSince1970: Double {
         return (timeIntervalSince1970 as Double) * 1000
     }
 
     /// Integer milliseconds since 1970.
-    public var integerMillisecondsSince1970: Int64 {
+    var integerMillisecondsSince1970: Int64 {
         return Int64(timeIntervalSince1970 * 1000)
     }
 }

@@ -128,6 +128,15 @@ public enum AValue: Codable {
                 return value
             }) else { return nil }
             self = .array(valueArray)
+        case let keyValues as KeyValuePairs<String, Any>:
+            var valueDictionary = [String: AValue](minimumCapacity: keyValues.count)
+            for element in keyValues {
+                guard let value = AValue(element.value) else {
+                    return nil
+                }
+                valueDictionary[element.key] = value
+            }
+            self = .dictionary(valueDictionary)
         default:
             return nil
         }
@@ -812,7 +821,7 @@ extension Data {
             guard int >= 0 && int <= byteMaxValue else { throw AValue.ValueError() }
             return UInt8(int)
         }) else { return nil }
-        self.init(bytes: bytes)
+        self.init(bytes)
     }
 
     /// Unwrap `value` that is either a data value, or an array of bytes.
@@ -837,7 +846,7 @@ public protocol ValueDecodable: Devaluable, Decodable { }
 public typealias CodedAsValue = ValueEncodable & ValueDecodable
 
 public extension ValueDecodable {
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let value = try AValue(from: decoder)
         guard let unwrapped = Self(unwrapping: value) else {
             throw AValue.ValueError()
@@ -847,7 +856,7 @@ public extension ValueDecodable {
 }
 
 public extension ValueEncodable {
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         try asValue.encode(to: encoder)
     }
 }

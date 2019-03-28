@@ -20,7 +20,7 @@ import Foundation
 
 public extension JSONEncoder {
     /// Encode `value` into a JSON string.
-    public func encodedString<T: Encodable>(from value: T) throws -> String {
+    func encodedString<T: Encodable>(from value: T) throws -> String {
         let data = try encode(value)
         guard let string = String(data: data, encoding: .utf8) else {
             throw EncodingError.invalidValue(data, .init(codingPath: [], debugDescription: "Result not UTF-8"))
@@ -31,7 +31,7 @@ public extension JSONEncoder {
 
 public extension JSONDecoder {
     /// Decode `string` into an object of the given `type`.
-    public func decode<T: Decodable>(_ type: T.Type, from string: String) throws -> T {
+    func decode<T: Decodable>(_ type: T.Type, from string: String) throws -> T {
         guard let data = string.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "String not UTF-8"))
         }
@@ -43,7 +43,7 @@ public extension JSONDecoder {
 
 public extension JSONEncoder {
     /// Encode `string` into a JSON fragment without any container.
-    public func encode(string: String) -> Data {
+    func encode(string: String) -> Data {
         let wrappedString: [String] = [ string ]
         guard var encoded = try? encode(wrappedString) else { return Data() }
 
@@ -59,7 +59,7 @@ public extension JSONEncoder {
     }
 
     /// Encode `string` into a JSON fragment without any container.
-    public func encodedString(fromString string: String) -> String {
+    func encodedString(fromString string: String) -> String {
         let data = encode(string: string)
         guard let string = String(data: data, encoding: .utf8) else { return "" }
         return string
@@ -72,7 +72,7 @@ public extension KeyedDecodingContainer {
     /// Attempt to decode the value for `key` if present. If `key` is not
     /// present, returns `defaultValue`. If `key` is present but not decodable
     /// to this type, returns `nil`.
-    public func decode<T>(key: K, valueIfMissing defaultValue: T) throws -> T? where T: Decodable {
+    func decode<T>(key: K, valueIfMissing defaultValue: T) throws -> T? where T: Decodable {
         if let value = try decodeIfPresent(T.self, forKey: key) {
             return value
         }
@@ -81,11 +81,8 @@ public extension KeyedDecodingContainer {
 
     /// Attempt to decode the value for `key` if present. If `key` is not
     /// present or cannot be decoded for any reason, returns `defaultValue`.
-    public func decode<T>(key: K, fallback defaultValue: T) -> T where T: Decodable {
-        if let v = try? decodeIfPresent(T.self, forKey: key), let value = v {
-            return value
-        }
-        return defaultValue
+    func decode<T>(key: K, fallback defaultValue: T) -> T where T: Decodable {
+        return (try? decodeIfPresent(T.self, forKey: key)) ?? defaultValue
     }
 }
 

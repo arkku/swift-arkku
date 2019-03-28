@@ -41,6 +41,8 @@
 		4E735A992131B88F002CAD6F /* LinkedNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E735A972131B88F002CAD6F /* LinkedNodes.swift */; };
 		4E735A9C2131BAAB002CAD6F /* NodeList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D4021221AAB006A519E /* NodeList.swift */; };
 		4E735A9D2131BAAC002CAD6F /* NodeList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5B8D4021221AAB006A519E /* NodeList.swift */; };
+		4E9A06F0224D06F300ADAC0C /* NodeListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9A06EF224D06F300ADAC0C /* NodeListTests.swift */; };
+		4E9A06F2224D06F300ADAC0C /* SwiftArkku.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E50D319211BC83F007239EE /* SwiftArkku.framework */; };
 		4EAD810921331D4A00096D1F /* MulticastDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAD810821331D4A00096D1F /* MulticastDelegates.swift */; };
 		4EAD810A21331D4A00096D1F /* MulticastDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAD810821331D4A00096D1F /* MulticastDelegates.swift */; };
 		4EAD810C21331EFE00096D1F /* WeakReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAD810B21331EFE00096D1F /* WeakReference.swift */; };
@@ -60,6 +62,16 @@
 		4EF7B8E22195F61000BFBD6E /* DataHexEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF7B8E12195F61000BFBD6E /* DataHexEncoding.swift */; };
 		4EF7B8E32195F61000BFBD6E /* DataHexEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF7B8E12195F61000BFBD6E /* DataHexEncoding.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4E9A06F3224D06F300ADAC0C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E50D310211BC83F007239EE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4E50D318211BC83F007239EE;
+			remoteInfo = "SwiftArkku macOS";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		4E2A70A2211CF7DE001F21F5 /* JSONHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelpers.swift; sourceTree = "<group>"; };
@@ -82,6 +94,9 @@
 		4E735A912131884C002CAD6F /* ConcatenatedInputStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcatenatedInputStream.swift; sourceTree = "<group>"; };
 		4E735A9421318C41002CAD6F /* FormDataInputStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormDataInputStream.swift; sourceTree = "<group>"; };
 		4E735A972131B88F002CAD6F /* LinkedNodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedNodes.swift; sourceTree = "<group>"; };
+		4E9A06ED224D06F300ADAC0C /* SwiftArkkuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftArkkuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E9A06EF224D06F300ADAC0C /* NodeListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeListTests.swift; sourceTree = "<group>"; };
+		4E9A06F1224D06F300ADAC0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4EAD810821331D4A00096D1F /* MulticastDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MulticastDelegates.swift; sourceTree = "<group>"; };
 		4EAD810B21331EFE00096D1F /* WeakReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakReference.swift; sourceTree = "<group>"; };
 		4EE2865421430D1D000FAA21 /* KeychainStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
@@ -105,6 +120,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E9A06EA224D06F300ADAC0C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E9A06F2224D06F300ADAC0C /* SwiftArkku.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,6 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				4E50D31B211BC83F007239EE /* SwiftArkku */,
+				4E9A06EE224D06F300ADAC0C /* Tests */,
 				4E50D31A211BC83F007239EE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -145,6 +169,7 @@
 			children = (
 				4E50D319211BC83F007239EE /* SwiftArkku.framework */,
 				4E50D330211BCAA6007239EE /* SwiftArkku.framework */,
+				4E9A06ED224D06F300ADAC0C /* SwiftArkkuTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -195,6 +220,16 @@
 				4E5B8D502123733F006A519E /* ArrayExtensions.swift */,
 			);
 			path = "Data Structures";
+			sourceTree = "<group>";
+		};
+		4E9A06EE224D06F300ADAC0C /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				4E9A06EF224D06F300ADAC0C /* NodeListTests.swift */,
+				4E9A06F1224D06F300ADAC0C /* Info.plist */,
+			);
+			name = Tests;
+			path = "../../../../../code/swift-arkku/Tests";
 			sourceTree = "<group>";
 		};
 		4EED37D021321E380067B6A2 /* Extensions */ = {
@@ -268,20 +303,43 @@
 			productReference = 4E50D330211BCAA6007239EE /* SwiftArkku.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		4E9A06EC224D06F300ADAC0C /* SwiftArkkuTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E9A06F5224D06F300ADAC0C /* Build configuration list for PBXNativeTarget "SwiftArkkuTests" */;
+			buildPhases = (
+				4E9A06E9224D06F300ADAC0C /* Sources */,
+				4E9A06EA224D06F300ADAC0C /* Frameworks */,
+				4E9A06EB224D06F300ADAC0C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4E9A06F4224D06F300ADAC0C /* PBXTargetDependency */,
+			);
+			name = SwiftArkkuTests;
+			productName = SwiftArkkuTests;
+			productReference = 4E9A06ED224D06F300ADAC0C /* SwiftArkkuTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		4E50D310211BC83F007239EE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1000;
+				LastSwiftUpdateCheck = 1020;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "Kimmo Kulovesi";
 				TargetAttributes = {
 					4E50D318211BC83F007239EE = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = 1020;
 					};
 					4E50D32F211BCAA6007239EE = {
 						CreatedOnToolsVersion = 10.0;
+					};
+					4E9A06EC224D06F300ADAC0C = {
+						CreatedOnToolsVersion = 10.2;
 					};
 				};
 			};
@@ -291,6 +349,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 4E50D30F211BC83F007239EE;
 			productRefGroup = 4E50D31A211BC83F007239EE /* Products */;
@@ -299,6 +358,7 @@
 			targets = (
 				4E50D318211BC83F007239EE /* SwiftArkku macOS */,
 				4E50D32F211BCAA6007239EE /* SwiftArkku iOS */,
+				4E9A06EC224D06F300ADAC0C /* SwiftArkkuTests */,
 			);
 		};
 /* End PBXProject section */
@@ -312,6 +372,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4E50D32E211BCAA6007239EE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E9A06EB224D06F300ADAC0C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -385,7 +452,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4E9A06E9224D06F300ADAC0C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E9A06F0224D06F300ADAC0C /* NodeListTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4E9A06F4224D06F300ADAC0C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4E50D318211BC83F007239EE /* SwiftArkku macOS */;
+			targetProxy = 4E9A06F3224D06F300ADAC0C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		4E50D31F211BC83F007239EE /* Debug */ = {
@@ -532,7 +615,7 @@
 				PRODUCT_NAME = SwiftArkku;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -559,14 +642,14 @@
 				PRODUCT_NAME = SwiftArkku;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
 		4E50D335211BCAA6007239EE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -585,7 +668,7 @@
 				PRODUCT_NAME = SwiftArkku;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -593,7 +676,7 @@
 		4E50D336211BCAA6007239EE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -612,9 +695,49 @@
 				PRODUCT_NAME = SwiftArkku;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4E9A06F6224D06F300ADAC0C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = Z9SZXWKQK9;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = com.arkku.SwiftArkkuTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		4E9A06F7224D06F300ADAC0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = Z9SZXWKQK9;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = com.arkku.SwiftArkkuTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -644,6 +767,15 @@
 			buildConfigurations = (
 				4E50D335211BCAA6007239EE /* Debug */,
 				4E50D336211BCAA6007239EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4E9A06F5224D06F300ADAC0C /* Build configuration list for PBXNativeTarget "SwiftArkkuTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E9A06F6224D06F300ADAC0C /* Debug */,
+				4E9A06F7224D06F300ADAC0C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
