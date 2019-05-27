@@ -18,10 +18,8 @@
 // Access would then be, e.g., `dictionary["someString"]?.stringValue` or
 // `let myInt: Int16? = dictionary["someInt"]?.unwrapped()`.
 //
-// Copyright © 2018 Kimmo Kulovesi, https://github.com/arkku/
+// Copyright © 2018–2019 Kimmo Kulovesi, https://github.com/arkku/
 //
-
-import Foundation
 
 /// Let us define a wrappable integer as something that will fit in a signed
 /// 64-bit integer. Now we can greatly simplify things by only having one
@@ -93,6 +91,8 @@ public enum AValue: Codable {
     /// A boolean value.
     case boolean(Bool)
 
+    case `nil`
+
     /// Try to wrap `value` in the most appropriate type.
     ///
     /// Note that as a special case, arrays of bytes (`UInt8`) passed here are converted
@@ -108,12 +108,26 @@ public enum AValue: Codable {
             self = .data(Data(byteArray))
         case let valuable as Valuable:
             self = valuable.asValue
+        case let dictionary as [String: Any?]:
+            guard let valueDictionary: [String: AValue] = (try? dictionary.compactMapValues { anyValue in
+                guard let anyValue = anyValue else { return nil }
+                guard let value = AValue(anyValue) else { throw ValueError() }
+                return value
+                }) else { return nil }
+            self = .dictionary(valueDictionary)
         case let dictionary as [String: Any]:
             guard let valueDictionary: [String: AValue] = (try? dictionary.mapValues { anyValue in
                 guard let value = AValue(anyValue) else { throw ValueError() }
                 return value
                 }) else { return nil }
             self = .dictionary(valueDictionary)
+        case let dictionary as [Int: Any?]:
+            guard let valueDictionary: [Int: AValue] = (try? dictionary.compactMapValues { anyValue in
+                guard let anyValue = anyValue else { return nil }
+                guard let value = AValue(anyValue) else { throw ValueError() }
+                return value
+                }) else { return nil }
+            self = .mapInt(valueDictionary)
         case let dictionary as [Int: Any]:
             guard let valueDictionary: [Int: AValue] = (try? dictionary.mapValues { anyValue in
                 guard let value = AValue(anyValue) else { throw ValueError() }
@@ -137,6 +151,8 @@ public enum AValue: Codable {
                 valueDictionary[element.key] = value
             }
             self = .dictionary(valueDictionary)
+        case nil:
+            self = .nil
         default:
             return nil
         }
@@ -150,8 +166,8 @@ public enum AValue: Codable {
             self = .integer(int)
         } else if let bool = try? container.decode(Bool.self) {
             self = .boolean(bool)
-        } else if let dictionary = try? container.decode([String: AValue].self) {
-            self = .dictionary(dictionary)
+        } else if let dictionary = try? container.decode([String: AValue?].self) {
+            self = .dictionary(dictionary.compactMapValues { $0 == .nil ? nil : $0 })
         } else if let array = try? container.decode([AValue].self) {
             self = .array(array)
         } else if let float = try? container.decode(Double.self) {
@@ -160,8 +176,10 @@ public enum AValue: Codable {
             self = .date(date)
         } else if let data = try? container.decode(Data.self) {
             self = .data(data)
-        } else if let dictionary = try? container.decode([Int: AValue].self) {
-            self = .mapInt(dictionary)
+        } else if let dictionary = try? container.decode([Int: AValue?].self) {
+            self = .mapInt(dictionary.compactMapValues { $0 == .nil ? nil : $0 })
+        } else if container.decodeNil() {
+            self = .nil
         } else {
             throw DecodingError.valueNotFound(AValue.self,
                 .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode value"))
@@ -176,10 +194,13 @@ public enum AValue: Codable {
         case .float(let float):     try container.encode(float)
         case .date(let date):       try container.encode(date)
         case .data(let data):       try container.encode(data)
-        case .dictionary(let dict): try container.encode(dict)
         case .array(let array):     try container.encode(array)
         case .boolean(let bool):    try container.encode(bool)
+        case .dictionary(let dict):
+            try container.encode(dict.compactMapValues { $0 == .nil ? nil : $0 })
         case .mapInt(let dict):     try container.encode(dict)
+            try container.encode(dict.compactMapValues { $0 == .nil ? nil : $0 })
+        case .nil:                  try container.encodeNil()
         }
     }
 
@@ -209,6 +230,8 @@ public enum AValue: Codable {
             return dictionary.mapValues { $0.anyValue } as [Int: Any]
         case .boolean(let bool):
             return bool as Any
+        case .nil:
+            return (nil as Any?) as Any
         }
     }
 
@@ -354,6 +377,7 @@ extension AValue: CustomStringConvertible, CustomDebugStringConvertible {
         case .dictionary(let dictionary): return dictionary.description
         case .mapInt(let dictionary): return dictionary.description
         case .boolean(let bool): return String(bool)
+        case .nil: return ""
         }
     }
 
@@ -368,6 +392,7 @@ extension AValue: CustomStringConvertible, CustomDebugStringConvertible {
         case .dictionary(let dictionary): return dictionary.debugDescription
         case .mapInt(let dictionary): return dictionary.debugDescription
         case .boolean(let bool): return bool.description
+        case .nil: return "null"
         }
     }
 }
