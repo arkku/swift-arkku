@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import Formats
 
 public extension FormData {
     /// Make an `InputStream` reading the `body` of this form.
