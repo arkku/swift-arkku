@@ -105,6 +105,7 @@
 		4EEF8D092133289100A50279 /* DateAndTimeHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateAndTimeHelpers.swift; sourceTree = "<group>"; };
 		4EEF8D0E2133511F00A50279 /* GeometryHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryHelpers.swift; sourceTree = "<group>"; };
 		4EEF8D112133584300A50279 /* LocalizationHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationHelpers.swift; sourceTree = "<group>"; };
+		4EF0D297230C1CB100201538 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		4EF7B8E12195F61000BFBD6E /* DataHexEncoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataHexEncoding.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -158,6 +159,7 @@
 		4E50D30F211BC83F007239EE = {
 			isa = PBXGroup;
 			children = (
+				4EF0D297230C1CB100201538 /* Package.swift */,
 				4E50D31B211BC83F007239EE /* SwiftArkku */,
 				4E9A06EE224D06F300ADAC0C /* Tests */,
 				4E50D31A211BC83F007239EE /* Products */,
@@ -184,6 +186,7 @@
 				4E50D33A211BCE7C007239EE /* Supporting Files */,
 			);
 			name = SwiftArkku;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		4E50D324211BC8C0007239EE /* Wrappers */ = {
@@ -228,8 +231,7 @@
 				4E9A06EF224D06F300ADAC0C /* NodeListTests.swift */,
 				4E9A06F1224D06F300ADAC0C /* Info.plist */,
 			);
-			name = Tests;
-			path = "../../../../../code/swift-arkku/Tests";
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		4EED37D021321E380067B6A2 /* Extensions */ = {

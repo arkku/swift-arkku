@@ -21,6 +21,8 @@
 // Copyright © 2018–2019 Kimmo Kulovesi, https://github.com/arkku/
 //
 
+import Foundation
+
 /// Let us define a wrappable integer as something that will fit in a signed
 /// 64-bit integer. Now we can greatly simplify things by only having one
 /// integer case for `AValue`.
