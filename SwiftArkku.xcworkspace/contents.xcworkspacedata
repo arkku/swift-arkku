@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/arkku/code/swift-arkku/Playground.playground">
+      location = "group:Playground.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/arkku/code/swift-arkku/SwiftArkku.xcodeproj">
+      location = "group:SwiftArkku.xcodeproj">
    </FileRef>
 </Workspace>

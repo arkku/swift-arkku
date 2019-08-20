@@ -184,6 +184,7 @@
 				4E50D33A211BCE7C007239EE /* Supporting Files */,
 			);
 			name = SwiftArkku;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		4E50D324211BC8C0007239EE /* Wrappers */ = {
