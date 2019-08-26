@@ -8,9 +8,6 @@
 //
 
 import Foundation
-#if canImport(Formats)
-import Formats
-#endif
 
 public extension FormData {
     /// Make an `InputStream` reading the `body` of this form.

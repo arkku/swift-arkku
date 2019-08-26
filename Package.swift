@@ -9,22 +9,9 @@ let package = Package(
         .iOS(.v11),
     ],
     products: [
-        .library(
-            name: "SwiftArkku",
-            targets: ["Data Structures", "Extensions", "Formats", "Wrappers"]),
+        .library(name: "SwiftArkku", targets: ["SwiftArkku"]),
     ],
     targets: [
-        .target(
-            name: "Data Structures",
-            dependencies: []),
-        .target(
-            name: "Extensions",
-            dependencies: []),
-        .target(
-            name: "Formats",
-            dependencies: []),
-        .target(
-            name: "Wrappers",
-            dependencies: ["Formats"]),
+        .target(name: "SwiftArkku", dependencies: []),
     ]
 )
