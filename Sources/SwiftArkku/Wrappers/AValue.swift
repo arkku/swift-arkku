@@ -109,7 +109,12 @@ public enum AValue: Codable {
             // an `array`. It is possible to circumvent this with `asValue`.
             self = .data(Data(byteArray))
         case let valuable as Valuable:
+            // One would expect this to catch all the Valuable stuff, but apparently not?
             self = valuable.asValue
+        case let string as String:
+            self = .string(string)
+        case let integer as Integer:
+            self = .integer(integer)
         case let dictionary as [String: Any?]:
             guard let valueDictionary: [String: AValue] = (try? dictionary.compactMapValues { anyValue in
                 guard let anyValue = anyValue else { return nil }
@@ -136,6 +141,16 @@ public enum AValue: Codable {
                 return value
                 }) else { return nil }
             self = .mapInt(valueDictionary)
+        case let dictionary as [AnyHashable: Any]:
+            guard let valueDictionary: [String: AValue] = (try? [String: AValue](dictionary.map { anyKey, anyValue in
+                guard let key = anyKey as? String, let value = AValue(anyValue) else {
+                    throw ValueError()
+                }
+                return (key, value)
+            }, uniquingKeysWith: { (a, _) in a })) else {
+                return nil
+            }
+            self = .dictionary(valueDictionary)
         case let sequence as AnySequence<Valuable>:
             self = .array(sequence.map { $0.asValue })
         case let array as [Any]:
@@ -153,6 +168,20 @@ public enum AValue: Codable {
                 valueDictionary[element.key] = value
             }
             self = .dictionary(valueDictionary)
+        case let bool as Bool:
+            self = .boolean(bool)
+        case let date as Date:
+            self = .date(date)
+        case let double as Double:
+            self = .float(double)
+        case let float as Float:
+            self = .float(Double(float))
+        case let int as Int:
+            self = .integer(Integer(int))
+        case let uint as UInt:
+            self = uint.asValue
+        case let data as Data:
+            self = .data(data)
         case nil:
             self = .nil
         default:
