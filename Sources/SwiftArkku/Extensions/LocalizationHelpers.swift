@@ -5,15 +5,14 @@
 // Copyright © 2016 Kimmo Kulovesi, https://github.com/arkku/
 //
 
-#if canImport(UIKit)
-import UIKit
-#endif
-#if canImport(AppKit)
+#if os(OSX) || targetEnvironment(macCatalyst)
 import AppKit
 
 /// Is the application right to left?
 public var isRightToLeft = (NSApplication.shared.userInterfaceLayoutDirection == .rightToLeft)
 #elseif canImport(UIKit)
+import UIKit
+
 /// Is the application right to left?
 public var isRightToLeft = (UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft)
 #endif
